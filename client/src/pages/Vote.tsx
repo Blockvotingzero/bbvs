@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,13 +9,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { type Candidate } from "@shared/schema";
 
 const verifySchema = z.object({
   nin: z.string().min(10, "NIN must be at least 10 characters"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 characters")
 });
+
+const STORAGE_KEY = "voter_verification";
 
 export default function Vote() {
   const [, setLocation] = useLocation();
@@ -27,6 +29,16 @@ export default function Vote() {
     phoneNumber: string;
     otp?: string;
   } | null>(null);
+
+  // Load verification data from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored);
+      setVerificationData(data);
+      setStep("vote");
+    }
+  }, []);
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
@@ -57,11 +69,22 @@ export default function Vote() {
       return res.json();
     },
     onSuccess: () => {
+      // Invalidate both votes and candidates queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["/api/votes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/candidates"] });
+
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
       });
       setLocation("/");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive"
+      });
     }
   });
 
@@ -71,7 +94,10 @@ export default function Vote() {
 
   const onOtpSubmit = (otp: string) => {
     if (!verificationData) return;
-    setVerificationData({ ...verificationData, otp });
+    const updatedData = { ...verificationData, otp };
+    setVerificationData(updatedData);
+    // Store verification data in localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedData));
     setStep("vote");
   };
 
