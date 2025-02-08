@@ -1,0 +1,87 @@
+### Revised Frontend Design and Functionality for Blockchain-Based Voting System
+
+The frontend of the Blockchain-Based Voting System has been revised to align with your feedback. The **landing page is now the voting statistics page**, and the **navbar includes a "Vote" tab** and a **"View Blockchain" tab**. Below is the updated description of the frontend design and functionality:
+
+---
+
+#### 1. **Landing Page (Voting Statistics Page)**
+   - **Purpose**: The landing page serves as the primary interface for users to view real-time voting statistics. It is the first page users see when they visit the system.
+   - **Design Elements**:
+     - **Header**: A clean header with the system's logo and a **navbar** containing two main tabs:
+       - **Vote**: Redirects users to the voting page.
+       - **View Blockchain**: Redirects users to the blockchain explorer page.
+     - **Real-Time Statistics**: 
+       - A dynamic section displaying real-time vote counts for each candidate, represented in **bar charts** or **pie charts**. The charts should update automatically without requiring a page refresh.
+       - Each candidate's name, photo, and current vote count should be displayed below the charts.
+     - **Filter Options**: 
+       - Allow users to filter statistics by **region**, **state**, or **local government area (LGA)** to see how voting patterns vary across Nigeria.
+       - Include dropdown menus or toggle buttons for easy filtering.
+     - **Export Options**: 
+       - Provide options to export the statistics as a **PDF** or **CSV** file for offline analysis.
+     - **Footer**: A footer with links to legal information, contact details, and social media handles.
+
+---
+
+#### 2. **Voting Page**
+   - **Purpose**: This page allows verified users to select a candidate and cast their vote. Users can access this page by clicking the **"Vote"** tab in the navbar.
+   - **Design Elements**:
+     - **User Verification Section**:
+       - Two input fields for **National Identification Number (NIN)** and **phone number**, with clear labels and placeholders.
+       - After entering the NIN and phone number, users receive an **OTP (One-Time Password)** via SMS. An input field for the OTP should appear, along with a **"Verify OTP"** button.
+       - **Error Handling**: Display error messages if the NIN or phone number is invalid, or if the OTP is incorrect.
+       - **Progress Indicator**: A visual indicator (e.g., a spinner) to show that the verification process is ongoing.
+     - **Candidate Selection Section**:
+       - A list of candidates with their **names**, **photos**, and a **brief description**. Each candidate should have a **"Select"** button next to their name.
+       - When a user clicks the **"Select"** button, a **confirmation modal** should appear, displaying the selected candidate's name and a warning that the vote cannot be changed once submitted.
+     - **Vote Submission**:
+       - A **"Submit Vote"** button in the modal to finalize the vote. Once clicked, the vote is signed with the user's cryptographic hash and recorded on the blockchain.
+       - **Success Message**: After a successful vote, a confirmation message should appear, thanking the user for voting and redirecting them back to the landing page after a few seconds.
+       - **Error Handling**: If the vote submission fails (e.g., due to network issues), an error message should be displayed, and the user should be given the option to retry.
+
+---
+
+#### 3. **Blockchain Explorer Page**
+   - **Purpose**: This page allows users to view the blockchain transactions in real-time, ensuring transparency and trust in the voting process. Users can access this page by clicking the **"View Blockchain"** tab in the navbar.
+   - **Design Elements**:
+     - **Blockchain Transactions Table**:
+       - A table displaying all recorded votes as transactions on the blockchain.
+       - Each row should include:
+         - **Transaction Hash**: A unique identifier for the transaction.
+         - **Timestamp**: The date and time when the vote was recorded.
+         - **Candidate**: The candidate for whom the vote was cast.
+         - **Voter Hash**: The cryptographic hash of the voter's verified data (no personal information is displayed).
+       - The table should be **paginated** to handle large volumes of transactions.
+     - **Search Functionality**:
+       - Allow users to search for specific transactions by **transaction hash**, **candidate name**, or **timestamp**.
+     - **Blockchain Information**:
+       - Display basic information about the blockchain, such as the **current block height**, **total votes recorded**, and **average transaction time**.
+     - **Export Options**:
+       - Provide options to export the transaction data as a **CSV** or **JSON** file for further analysis.
+
+---
+
+#### 4. **Responsive Design**
+   - **Mobile-First Approach**: The frontend should be designed with a mobile-first approach, ensuring that the system is fully functional and visually appealing on mobile devices.
+   - **Responsive Layout**: Use a responsive grid system (e.g., **Tailwind CSS**) to ensure that the layout adapts to different screen sizes, from smartphones to tablets and desktops.
+   - **Touch-Friendly Elements**: Ensure that buttons, forms, and other interactive elements are large enough to be easily tapped on touchscreens.
+   - **Cross-Browser Compatibility**: Test the frontend on multiple browsers (e.g., Chrome, Firefox, Safari) to ensure consistent performance and appearance.
+
+---
+
+#### 5. **Testing the System Without API/Blockchain**
+   - **Mock Data**: Use mock data to simulate the voting process, including user verification, candidate selection, and vote submission. This allows for thorough testing of the frontend before integrating with the backend.
+   - **Local Storage**: Temporarily store votes in the browser's **local storage** to simulate the blockchain's immutability and ensure that users cannot vote more than once.
+   - **Error Simulation**: Simulate various error scenarios (e.g., network failure, invalid OTP) to test the frontend's error handling and user feedback mechanisms.
+   - **Performance Testing**: Test the frontend's performance under different conditions, such as slow network speeds or high user traffic, to ensure a smooth user experience.
+
+---
+
+#### 6. **Additional Pages**
+   - **About Page**: A page providing information about the voting system, its benefits, and how it ensures security and transparency.
+   - **FAQ Page**: A page with frequently asked questions and answers to help users understand the voting process and troubleshoot common issues.
+   - **Contact Page**: A page with contact information for technical support, including a form for users to submit queries or report issues.
+
+---
+
+### Conclusion
+The revised frontend design places the **voting statistics page** as the **landing page**, ensuring that users are immediately presented with real-time election data. The **navbar** includes a **"Vote"** tab for casting votes and a **"View Blockchain"** tab for exploring blockchain transactions, enhancing transparency and user engagement. The system is designed to be **responsive**, **user-friendly**, and **testable** without requiring immediate integration with the API or blockchain. This approach ensures a smooth and secure voting experience for users in Nigeria.
