@@ -8,26 +8,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className="border-b">
         <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/">
-            <a className="text-2xl font-bold text-primary">
+            <span className="text-2xl font-bold text-primary cursor-pointer">
               BlockVote
-            </a>
+            </span>
           </Link>
-          
+
           <div className="flex gap-6">
             <Link href="/">
-              <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+              <span className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors cursor-pointer`}>
                 Statistics
-              </a>
+              </span>
             </Link>
             <Link href="/vote">
-              <a className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+              <span className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors cursor-pointer`}>
                 Vote
-              </a>
+              </span>
             </Link>
             <Link href="/explorer">
-              <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+              <span className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors cursor-pointer`}>
                 Explorer
-              </a>
+              </span>
             </Link>
           </div>
         </nav>
@@ -41,8 +41,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm text-muted-foreground">
           <p>© 2024 BlockVote. All rights reserved.</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-primary">Privacy Policy</a>
-            <a href="#" className="hover:text-primary">Terms of Service</a>
+            <Link href="/privacy">
+              <span className="hover:text-primary cursor-pointer">Privacy Policy</span>
+            </Link>
+            <Link href="/terms">
+              <span className="hover:text-primary cursor-pointer">Terms of Service</span>
+            </Link>
           </div>
         </div>
       </footer>
