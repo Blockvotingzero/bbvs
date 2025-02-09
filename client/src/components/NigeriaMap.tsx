@@ -33,12 +33,11 @@ export default function NigeriaMap({ stateData, onStateClick }: Props) {
           </div>
         </div>
       )}
-      
+
       <svg
         viewBox="0 0 800 800"
         className="w-full h-full"
       >
-        {/* This is a simplified example - you would need to add all state paths */}
         <path
           d="M400 300 L450 350 L400 400 L350 350 Z"
           className={`
@@ -49,7 +48,17 @@ export default function NigeriaMap({ stateData, onStateClick }: Props) {
           onMouseLeave={() => handleStateHover(null)}
           onClick={() => onStateClick('Lagos')}
         />
-        {/* Add more state paths here */}
+        <path
+          d="M500 400 L550 450 L500 500 L450 450 Z"
+          className={`
+            ${hoveredState === 'Abuja' ? 'fill-primary/20' : 'fill-muted'}
+            stroke-border hover:fill-primary/20 cursor-pointer transition-colors
+          `}
+          onMouseEnter={() => handleStateHover('Abuja')}
+          onMouseLeave={() => handleStateHover(null)}
+          onClick={() => onStateClick('Abuja')}
+        />
+        {/* Add more state paths here with actual coordinate data */}
       </svg>
     </div>
   );
