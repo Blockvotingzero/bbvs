@@ -57,9 +57,21 @@ async function initializeCandidates() {
   const existingCandidates = await db.select().from(candidates);
   if (existingCandidates.length === 0) {
     await db.insert(candidates).values([
-      { name: "John Doe", party: "Progressive Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=john" },
-      { name: "Jane Smith", party: "Conservative Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=jane" },
-      { name: "Mike Johnson", party: "Liberty Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=mike" }
+      { 
+        name: "Bola Ahmed Tinubu", 
+        party: "All Progressives Congress (APC)", 
+        avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=tinubu" 
+      },
+      { 
+        name: "Peter Obi", 
+        party: "Labour Party (LP)", 
+        avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=obi" 
+      },
+      { 
+        name: "Atiku Abubakar", 
+        party: "Peoples Democratic Party (PDP)", 
+        avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=atiku" 
+      }
     ]);
   }
 }
