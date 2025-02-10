@@ -93,7 +93,7 @@ export default function Vote() {
 
   if (step === "verify") {
     return (
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto px-4 sm:px-6">
         <Card>
           <CardHeader>
             <CardTitle>Voter Verification</CardTitle>
@@ -140,7 +140,7 @@ export default function Vote() {
 
   if (step === "otp") {
     return (
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto px-4 sm:px-6">
         <Card>
           <CardHeader>
             <CardTitle>Enter OTP</CardTitle>
