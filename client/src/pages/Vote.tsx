@@ -27,6 +27,8 @@ export default function Vote() {
     phoneNumber: string;
     otp?: string;
   } | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
@@ -61,11 +63,11 @@ export default function Vote() {
       return res.json();
     },
     onSuccess: () => {
+      setHasVoted(true);
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
       });
-      setLocation("/");
     }
   });
 
@@ -83,12 +85,18 @@ export default function Vote() {
 
   const onVoteSubmit = () => {
     if (!verificationData?.otp || !selectedCandidate) return;
+    setShowConfirm(true);
+  };
+
+  const confirmVote = () => {
+    if (!verificationData?.otp || !selectedCandidate) return;
     voteMutation.mutate({
       nin: verificationData.nin,
       phoneNumber: verificationData.phoneNumber,
       otp: verificationData.otp,
       candidateId: selectedCandidate
     });
+    setShowConfirm(false);
   };
 
   if (step === "verify") {
@@ -202,13 +210,24 @@ export default function Vote() {
           </Card>
         ))}
       </div>
-      <Button
-        className="mt-8 w-full"
-        disabled={!selectedCandidate || voteMutation.isPending}
-        onClick={onVoteSubmit}
-      >
-        {voteMutation.isPending ? "Submitting Vote..." : "Submit Vote"}
-      </Button>
+      {hasVoted ? (
+        <p>Your vote has been cast.</p>
+      ) : (
+        <Button
+          className="mt-8 w-full"
+          disabled={!selectedCandidate || voteMutation.isPending}
+          onClick={onVoteSubmit}
+        >
+          {voteMutation.isPending ? "Submitting Vote..." : "Submit Vote"}
+        </Button>
+      )}
+      {showConfirm && (
+        <div>
+          <p>Are you sure you want to cast your vote?</p>
+          <Button onClick={confirmVote}>Confirm</Button>
+          <Button onClick={() => setShowConfirm(false)}>Cancel</Button>
+        </div>
+      )}
     </div>
   );
 }
