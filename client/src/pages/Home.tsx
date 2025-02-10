@@ -1,28 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import { type Vote, type Candidate } from "@shared/schema";
-import NigeriaMap from "@/components/NigeriaMap";
-
-// Mock state data
-const mockStateData = {
-  Lagos: {
-    name: "Lagos",
-    votes: {
-      "Bola Ahmed Tinubu": 45,
-      "Peter Obi": 35,
-      "Atiku Abubakar": 20
-    }
-  },
-  // Add more states here
-};
 
 export default function Home() {
-  const [selectedState, setSelectedState] = useState<string | null>(null);
-
   const { data: votes, isLoading: votesLoading } = useQuery<Vote[]>({
     queryKey: ["/api/votes"]
   });
@@ -51,34 +33,10 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Live Voting Statistics</h1>
-          <p className="text-muted-foreground">
-            {selectedState ? `Viewing results for ${selectedState}` : 'National results'}
-          </p>
-        </div>
-        {selectedState && (
-          <Button
-            variant="outline"
-            onClick={() => setSelectedState(null)}
-          >
-            View National Results
-          </Button>
-        )}
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Live Voting Statistics</h1>
+        <p className="text-muted-foreground">Real-time overview of the current election results</p>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Interactive Map</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <NigeriaMap
-            stateData={mockStateData}
-            onStateClick={setSelectedState}
-          />
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>
@@ -87,10 +45,7 @@ export default function Home() {
         <CardContent>
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={selectedState ? 
-                Object.entries(mockStateData[selectedState]?.votes || {}).map(([name, votes]) => ({ name, votes }))
-                : votesByCandidate
-              }>
+              <BarChart data={votesByCandidate}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -106,7 +61,7 @@ export default function Home() {
         {candidates.map(candidate => {
           const candidateVotes = votes.filter(vote => vote.candidateId === candidate.id).length;
           const percentage = ((candidateVotes / votes.length) * 100).toFixed(1);
-
+          
           return (
             <Card key={candidate.id}>
               <CardContent className="pt-6">

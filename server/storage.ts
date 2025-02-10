@@ -54,42 +54,15 @@ export class DatabaseStorage implements IStorage {
 
 // Initialize the candidates
 async function initializeCandidates() {
-    const existingCandidates = await db.select().from(candidates);
-    if (existingCandidates.length === 0) {
-      await db.insert(candidates).values([
-        { 
-          name: "Bola Ahmed Tinubu", 
-          party: "All Progressives Congress (APC)", 
-          avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=tinubu" 
-        },
-        { 
-          name: "Peter Obi", 
-          party: "Labour Party (LP)", 
-          avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=obi" 
-        },
-        { 
-          name: "Atiku Abubakar", 
-          party: "Peoples Democratic Party (PDP)", 
-          avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=atiku" 
-        }
-      ]);
-
-      // Add initial mock votes
-      const candidates = await db.select().from(candidates);
-      const mockVotes = [];
-      for (let i = 0; i < 100; i++) {
-        mockVotes.push({
-          candidateId: candidates[Math.floor(Math.random() * candidates.length)].id,
-          voterHash: `mock_voter_${i}`,
-          blockHeight: Math.floor(Math.random() * 1000000),
-          transactionHash: Array.from(crypto.getRandomValues(new Uint8Array(32)))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('')
-        });
-      }
-      await db.insert(votes).values(mockVotes);
-    }
+  const existingCandidates = await db.select().from(candidates);
+  if (existingCandidates.length === 0) {
+    await db.insert(candidates).values([
+      { name: "John Doe", party: "Progressive Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=john" },
+      { name: "Jane Smith", party: "Conservative Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=jane" },
+      { name: "Mike Johnson", party: "Liberty Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=mike" }
+    ]);
   }
+}
 
 export const storage = new DatabaseStorage();
 initializeCandidates().catch(console.error);

@@ -17,11 +17,6 @@ const verifySchema = z.object({
   phoneNumber: z.string().min(10, "Phone number must be at least 10 characters")
 });
 
-// Add OTP validation schema
-const otpSchema = z.object({
-  otp: z.string().length(4, "OTP must be exactly 4 digits")
-});
-
 const STORAGE_KEY = "voter_verification";
 
 export default function Vote() {
@@ -116,10 +111,6 @@ export default function Vote() {
     });
   };
 
-  const otpForm = useForm<{ otp: string }>({
-    resolver: zodResolver(otpSchema)
-  });
-
   if (step === "verify") {
     return (
       <div className="max-w-md mx-auto">
@@ -167,7 +158,6 @@ export default function Vote() {
     );
   }
 
-  // Update the OTP section in the return statement
   if (step === "otp") {
     return (
       <div className="max-w-md mx-auto">
@@ -176,35 +166,14 @@ export default function Vote() {
             <CardTitle>Enter OTP</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...otpForm}>
-              <form onSubmit={otpForm.handleSubmit((data) => onOtpSubmit(data.otp))} className="space-y-4">
-                <FormField
-                  control={otpForm.control}
-                  name="otp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Verification Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          maxLength={4}
-                          type="text"
-                          pattern="[0-9]*"
-                          inputMode="numeric"
-                          placeholder="Enter 4-digit code"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Verify OTP
-                </Button>
-              </form>
-            </Form>
-            <p className="text-sm text-muted-foreground mt-4">
-              Enter the 4-digit verification code sent to your phone
+            <Input
+              type="text"
+              placeholder="Enter OTP"
+              className="mb-4"
+              onChange={(e) => onOtpSubmit(e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              Enter the verification code sent to your phone
             </p>
           </CardContent>
         </Card>
