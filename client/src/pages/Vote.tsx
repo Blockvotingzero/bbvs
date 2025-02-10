@@ -81,14 +81,25 @@ export default function Vote() {
     }
   };
 
+  const [hasVoted, setHasVoted] = useState(false);
+
   const onVoteSubmit = () => {
-    if (!verificationData?.otp || !selectedCandidate) return;
-    voteMutation.mutate({
-      nin: verificationData.nin,
-      phoneNumber: verificationData.phoneNumber,
-      otp: verificationData.otp,
-      candidateId: selectedCandidate
-    });
+    if (!verificationData?.otp || !selectedCandidate || hasVoted) return;
+    
+    const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
+    
+    if (window.confirm(`Are you sure you want to vote for ${selectedCandidateName}? This action cannot be undone.`)) {
+      voteMutation.mutate({
+        nin: verificationData.nin,
+        phoneNumber: verificationData.phoneNumber,
+        otp: verificationData.otp,
+        candidateId: selectedCandidate
+      }, {
+        onSuccess: () => {
+          setHasVoted(true);
+        }
+      });
+    }
   };
 
   if (step === "verify") {
@@ -204,11 +215,16 @@ export default function Vote() {
       </div>
       <Button
         className="mt-8 w-full"
-        disabled={!selectedCandidate || voteMutation.isPending}
+        disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
         onClick={onVoteSubmit}
       >
         {voteMutation.isPending ? "Submitting Vote..." : "Submit Vote"}
       </Button>
+      {hasVoted && (
+        <p className="mt-4 text-center text-green-600 font-medium">
+          Your vote has been successfully cast. Thank you for participating!
+        </p>
+      )}
     </div>
   );
 }
