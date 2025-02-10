@@ -33,7 +33,11 @@ export default function Vote() {
   });
 
   const form = useForm<z.infer<typeof verifySchema>>({
-    resolver: zodResolver(verifySchema)
+    resolver: zodResolver(verifySchema),
+    defaultValues: {
+      nin: "",
+      phoneNumber: ""
+    }
   });
 
   const verifyMutation = useMutation({

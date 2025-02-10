@@ -12,24 +12,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               BlockVote
             </a>
           </Link>
-          
-          <div className="flex gap-6">
-            <Link href="/">
-              <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                Statistics
-              </a>
-            </Link>
-            <Link href="/vote">
-              <a className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                Vote
-              </a>
-            </Link>
-            <Link href="/explorer">
-              <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                Explorer
-              </a>
-            </Link>
-          </div>
+
+          <ul className="flex gap-6">
+            <li>
+              <Link href="/">
+                <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+                  Statistics
+                </a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/vote">
+                <a className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+                  Vote
+                </a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/explorer">
+                <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+                  Explorer
+                </a>
+              </Link>
+            </li>
+          </ul>
         </nav>
       </header>
 
