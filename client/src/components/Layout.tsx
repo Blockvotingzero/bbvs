@@ -16,8 +16,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <ul className="flex gap-6">
             <li>
               <Link href="/">
-                <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+                <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors flex items-center gap-2`}>
                   Statistics
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
                 </a>
               </Link>
             </li>
