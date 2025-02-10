@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import crypto from 'crypto';
 
 export function registerRoutes(app: Express): Server {
   app.get("/api/candidates", async (_req, res) => {
@@ -25,13 +24,13 @@ export function registerRoutes(app: Express): Server {
     try {
       const { nin, phoneNumber } = schema.parse(req.body);
       const user = await storage.getUser(nin, phoneNumber);
-
+      
       if (user?.hasVoted) {
         return res.status(400).json({ message: "User has already voted" });
       }
 
-      // For testing, accept any 6-digit number as OTP
-      res.json({ success: true });
+      // Mock OTP verification - in production this would send a real SMS
+      res.json({ success: true, otp: "123456" });
     } catch (error) {
       res.status(400).json({ message: "Invalid input" });
     }
@@ -42,15 +41,13 @@ export function registerRoutes(app: Express): Server {
       nin: z.string().min(10),
       phoneNumber: z.string().min(10),
       candidateId: z.number(),
-      otp: z.string().length(6)
+      otp: z.string()
     });
 
     try {
       const { nin, phoneNumber, candidateId, otp } = schema.parse(req.body);
-
-      // For testing, accept any 6-digit OTP
-      const isValidOtp = /^\d{6}$/.test(otp);
-      if (!isValidOtp) {
+      
+      if (otp !== "123456") {
         return res.status(400).json({ message: "Invalid OTP" });
       }
 
@@ -63,11 +60,9 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ message: "User has already voted" });
       }
 
-      const voterHash = Array.from(crypto.getRandomValues(new Uint8Array(32)))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+      const voterHash = nanoid(32);
       const vote = await storage.createVote(candidateId, voterHash);
-
+      
       res.json({ success: true, vote });
     } catch (error) {
       res.status(400).json({ message: "Invalid input" });
