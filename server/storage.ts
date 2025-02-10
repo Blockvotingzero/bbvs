@@ -7,6 +7,8 @@ export interface IStorage {
   getCandidates(): Promise<Candidate[]>;
   getVotes(): Promise<Vote[]>;
   createVote(candidateId: number, voterHash: string): Promise<Vote>;
+  updateVoteCount(candidateId: number): Promise<void>; // Added function to update vote count
+  updateUser(nin: string, phoneNumber: string, hasVoted: boolean):Promise<void>
 }
 
 export class MemStorage implements IStorage {
@@ -14,11 +16,13 @@ export class MemStorage implements IStorage {
   private candidates: Map<number, Candidate>;
   private votes: Map<number, Vote>;
   private currentId: number;
+  private voteCounts: Map<number, number>; // Added to track vote counts per candidate
 
   constructor() {
     this.users = new Map();
     this.candidates = new Map();
     this.votes = new Map();
+    this.voteCounts = new Map(); // Initialize vote counts
     this.currentId = 1;
 
     // Initialize mock candidates
@@ -30,6 +34,7 @@ export class MemStorage implements IStorage {
 
     mockCandidates.forEach(candidate => {
       this.candidates.set(candidate.id, candidate);
+      this.voteCounts.set(candidate.id, 0); // Initialize vote counts to 0
     });
 
     // Initialize with mock votes
@@ -55,6 +60,7 @@ export class MemStorage implements IStorage {
       };
 
       this.votes.set(vote.id, vote);
+      this.voteCounts.set(candidateId, (this.voteCounts.get(candidateId) || 0) + 1); // Update vote count
       this.currentId = Math.max(this.currentId, vote.id + 1);
     }
   }
@@ -77,7 +83,7 @@ export class MemStorage implements IStorage {
   }
 
   async getVotes(): Promise<Vote[]> {
-    return Array.from(this.votes.values()).sort((a, b) => 
+    return Array.from(this.votes.values()).sort((a, b) =>
       b.timestamp.getTime() - a.timestamp.getTime()
     );
   }
@@ -93,7 +99,20 @@ export class MemStorage implements IStorage {
       transactionHash: `0x${nanoid(64)}`
     };
     this.votes.set(id, vote);
+    this.voteCounts.set(candidateId, (this.voteCounts.get(candidateId) || 0) + 1); // Update vote count
     return vote;
+  }
+
+  async updateVoteCount(candidateId: number): Promise<void> {
+    const count = this.votes.size;
+    this.voteCounts.set(candidateId, count);
+  }
+
+  async updateUser(nin: string, phoneNumber: string, hasVoted: boolean): Promise<void> {
+    const user = this.users.get(nin)
+    if(user){
+      user.hasVoted = hasVoted;
+    }
   }
 }
 

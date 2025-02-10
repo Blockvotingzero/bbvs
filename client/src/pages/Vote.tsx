@@ -75,8 +75,10 @@ export default function Vote() {
 
   const onOtpSubmit = (otp: string) => {
     if (!verificationData) return;
-    setVerificationData({ ...verificationData, otp });
-    setStep("vote");
+    if (otp.length === 6 && /^\d+$/.test(otp)) {
+      setVerificationData({ ...verificationData, otp });
+      setStep("vote");
+    }
   };
 
   const onVoteSubmit = () => {

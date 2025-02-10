@@ -62,6 +62,7 @@ export function registerRoutes(app: Express): Server {
 
       const voterHash = nanoid(32);
       const vote = await storage.createVote(candidateId, voterHash);
+      await storage.updateUser(nin, phoneNumber, true);
       
       res.json({ success: true, vote });
     } catch (error) {
