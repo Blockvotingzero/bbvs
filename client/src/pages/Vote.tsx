@@ -163,6 +163,19 @@ export default function Vote() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <div className="mb-8 p-6 bg-card rounded-lg border shadow">
+        <div className="flex items-center gap-4">
+          <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+            <svg className="w-12 h-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold">Abubakar</h2>
+            <p className="text-muted-foreground">NIN: {verificationData?.nin}</p>
+          </div>
+        </div>
+      </div>
       <h1 className="text-3xl font-bold mb-8">Select a Candidate</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {candidates?.map((candidate) => (
