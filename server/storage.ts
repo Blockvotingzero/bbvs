@@ -31,6 +31,32 @@ export class MemStorage implements IStorage {
     mockCandidates.forEach(candidate => {
       this.candidates.set(candidate.id, candidate);
     });
+
+    // Initialize with mock votes
+    const startTime = new Date();
+    startTime.setDate(startTime.getDate() - 7);
+
+    // Generate 1000 mock votes with realistic distribution
+    for (let i = 0; i < 1000; i++) {
+      const rand = Math.random();
+      let candidateId = 1;
+      if (rand > 0.4) {
+        candidateId = rand > 0.75 ? 3 : 2;
+      }
+
+      const timestamp = new Date(startTime.getTime() + Math.random() * (Date.now() - startTime.getTime()));
+      const vote: Vote = {
+        id: i + 1,
+        candidateId,
+        voterHash: `0x${nanoid(40)}`,
+        timestamp,
+        blockHeight: 1000000 + i,
+        transactionHash: `0x${nanoid(64)}`
+      };
+
+      this.votes.set(vote.id, vote);
+      this.currentId = Math.max(this.currentId, vote.id + 1);
+    }
   }
 
   async getUser(nin: string, phoneNumber: string): Promise<User | undefined> {
@@ -51,7 +77,9 @@ export class MemStorage implements IStorage {
   }
 
   async getVotes(): Promise<Vote[]> {
-    return Array.from(this.votes.values());
+    return Array.from(this.votes.values()).sort((a, b) => 
+      b.timestamp.getTime() - a.timestamp.getTime()
+    );
   }
 
   async createVote(candidateId: number, voterHash: string): Promise<Vote> {
@@ -61,8 +89,8 @@ export class MemStorage implements IStorage {
       candidateId,
       voterHash,
       timestamp: new Date(),
-      blockHeight: Math.floor(Math.random() * 1000000),
-      transactionHash: nanoid(64)
+      blockHeight: Math.max(...Array.from(this.votes.values()).map(v => v.blockHeight)) + 1,
+      transactionHash: `0x${nanoid(64)}`
     };
     this.votes.set(id, vote);
     return vote;
