@@ -26,9 +26,14 @@ export default function Home() {
 
   if (!votes || !candidates) return null;
 
-  const votesByCandidate = candidates.map(candidate => ({
-    name: candidate.name,
-    votes: votes.filter(vote => vote.candidateId === candidate.id).length
+  const candidateVoteCounts = candidates.map(candidate => ({
+    ...candidate,
+    voteCount: votes.filter(vote => vote.candidateId === candidate.id).length
+  })).sort((a, b) => b.voteCount - a.voteCount); // Sort by vote count
+
+  const chartData = candidateVoteCounts.map(({ name, voteCount }) => ({
+    name,
+    votes: voteCount
   }));
 
   return (
@@ -45,7 +50,7 @@ export default function Home() {
         <CardContent>
           <div className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={votesByCandidate}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -58,10 +63,9 @@ export default function Home() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {candidates.map(candidate => {
-          const candidateVotes = votes.filter(vote => vote.candidateId === candidate.id).length;
-          const percentage = ((candidateVotes / votes.length) * 100).toFixed(1);
-          
+        {candidateVoteCounts.map(candidate => {
+          const percentage = ((candidate.voteCount / votes.length) * 100).toFixed(1);
+
           return (
             <Card key={candidate.id}>
               <CardContent className="pt-6">
@@ -77,7 +81,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <p className="text-2xl font-bold">{candidateVotes} votes</p>
+                  <p className="text-2xl font-bold">{candidate.voteCount} votes</p>
                   <p className="text-sm text-muted-foreground">{percentage}% of total votes</p>
                 </div>
               </CardContent>

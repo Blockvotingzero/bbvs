@@ -52,15 +52,35 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Initialize the candidates
+// Initialize the candidates with dummy votes
 async function initializeCandidates() {
   const existingCandidates = await db.select().from(candidates);
   if (existingCandidates.length === 0) {
+    // First insert candidates
     await db.insert(candidates).values([
-      { name: "John Doe", party: "Progressive Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=john" },
-      { name: "Jane Smith", party: "Conservative Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=jane" },
-      { name: "Mike Johnson", party: "Liberty Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=mike" }
+      { name: "Bola Ahmed Tinubu", party: "All Progressives Congress", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=tinubu" },
+      { name: "Peter Obi", party: "Labour Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=obi" },
+      { name: "Atiku Abubakar", party: "Peoples Democratic Party", avatar: "https://api.dicebear.com/7.x/avatars/svg?seed=atiku" }
     ]);
+
+    // Then add some dummy votes
+    const candidates = await db.select().from(candidates);
+    const dummyVotes = [];
+
+    // Generate random votes for each candidate
+    for (let i = 0; i < 100; i++) {
+      const candidateId = candidates[Math.floor(Math.random() * candidates.length)].id;
+      dummyVotes.push({
+        candidateId,
+        voterHash: `dummy_voter_${i}`,
+        blockHeight: Math.floor(Math.random() * 1000000),
+        transactionHash: Array.from(crypto.getRandomValues(new Uint8Array(32)))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('')
+      });
+    }
+
+    await db.insert(votes).values(dummyVotes);
   }
 }
 
