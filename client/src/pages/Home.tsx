@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Vote, type Candidate } from "@shared/schema";
+import NigeriaMap from "@/components/NigeriaMap"; // Import NigeriaMap component
 
 export default function Home() {
   const { data: votes, isLoading: votesLoading } = useQuery<Vote[]>({
@@ -36,6 +37,7 @@ export default function Home() {
       <div>
         <h1 className="text-3xl font-bold mb-2">Live Voting Statistics</h1>
         <p className="text-muted-foreground">Real-time overview of the current election results</p>
+        <NigeriaMap /> {/* Add NigeriaMap component here */}
       </div>
 
       <Card>
