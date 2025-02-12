@@ -15,6 +15,24 @@ type StateStats = {
 
 export default function NigeriaStatesMap() {
   const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [svgContent, setSvgContent] = useState<string>("");
+
+  useEffect(() => {
+    fetch('https://mapsvg.com/maps/geo-calibrated/nigeria.svg')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(data, 'image/svg+xml');
+        const svg = svgDoc.querySelector('svg');
+        if (svg) {
+          svg.setAttribute('width', '100%');
+          svg.setAttribute('height', '100%');
+          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+          setSvgContent(svg.outerHTML);
+        }
+      })
+      .catch(error => console.error('Error loading map:', error));
+  }, []);
 
   const getStateStats = (state: string): StateStats => {
     // Simulated stats
@@ -42,8 +60,10 @@ export default function NigeriaStatesMap() {
     <div className="rounded-lg border bg-card p-6 shadow-sm">
       <div className="flex gap-6">
         <div className="w-2/3">
-          {/* Add SVG map here */}
-          <div className="aspect-square bg-muted rounded-lg" />
+          <div 
+            className="aspect-square bg-white rounded-lg p-4 border"
+            dangerouslySetInnerHTML={{ __html: svgContent }}
+          />
         </div>
         
         <div className="w-1/3 space-y-4">
