@@ -51,7 +51,7 @@ export default function NigeriaMap() {
 
   const getStateSize = (votes: number) => {
     const normalized = (votes - minVotes) / (maxVotes - minVotes);
-    return 60 + normalized * 20; // Size between 60px and 80px
+    return 50 + normalized * 50; // Size between 50px and 100px
   };
 
   const getCandidateColor = (candidateId: number) => {
@@ -96,7 +96,7 @@ export default function NigeriaMap() {
         </div>
       </div>
       
-      <div className="w-2/3 grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 place-items-center">
+      <div className="w-2/3 grid grid-cols-6 gap-2 place-items-center">
         {filteredStates.map((state) => (
           <div
             key={state.name}
