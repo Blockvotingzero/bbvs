@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "./ui/input";
 import { type Vote } from "@shared/schema";
-import { cn } from '@/lib/utils';
 
 const nigerianStates = [
   'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
@@ -23,48 +22,18 @@ export default function NigeriaMap() {
 
   if (!votes) return null;
 
-  const getStateStats = (state: string) => {
-    const stateVotes = Math.floor(Math.random() * 1000) + 100; // Random votes for demo
-    const candidateVotes = {
-      1: Math.floor(Math.random() * stateVotes), // Tinubu
-      2: Math.floor(Math.random() * stateVotes), // Obi
-      3: Math.floor(Math.random() * stateVotes), // Atiku
-    };
-    
-    const leadingCandidate = Object.entries(candidateVotes)
-      .sort(([,a], [,b]) => b - a)[0][0];
-    
+  const getVoteStats = (state: string | null) => {
+    const relevantVotes = votes;
     return {
-      totalVotes: stateVotes,
-      leadingCandidate: parseInt(leadingCandidate),
-      votes: candidateVotes
+      total: relevantVotes.length,
+      tinubu: relevantVotes.filter(v => v.candidateId === 1).length,
+      obi: relevantVotes.filter(v => v.candidateId === 2).length,
+      atiku: relevantVotes.filter(v => v.candidateId === 3).length,
     };
   };
 
-  const stateStats = nigerianStates.map(state => ({
-    name: state,
-    ...getStateStats(state)
-  }));
-
-  const maxVotes = Math.max(...stateStats.map(s => s.totalVotes));
-  const minVotes = Math.min(...stateStats.map(s => s.totalVotes));
-
-  const getStateSize = (votes: number) => {
-    const normalized = (votes - minVotes) / (maxVotes - minVotes);
-    return 50 + normalized * 50; // Size between 50px and 100px
-  };
-
-  const getCandidateColor = (candidateId: number) => {
-    switch(candidateId) {
-      case 1: return 'bg-red-500/80';
-      case 2: return 'bg-green-500/80';
-      case 3: return 'bg-blue-500/80';
-      default: return 'bg-muted';
-    }
-  };
-
-  const filteredStates = stateStats.filter(state => 
-    state.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredStates = nigerianStates.filter(state => 
+    state.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -80,39 +49,29 @@ export default function NigeriaMap() {
           <h3 className="font-semibold mb-2">
             {selectedState || 'National'} Statistics
           </h3>
-          {selectedState && (
-            <div className="space-y-2">
-              {stateStats.find(s => s.name === selectedState) && (
-                <>
-                  <p>Total Votes: {stateStats.find(s => s.name === selectedState)?.totalVotes}</p>
-                  <p>Leading: {
-                    stateStats.find(s => s.name === selectedState)?.leadingCandidate === 1 ? "Tinubu" :
-                    stateStats.find(s => s.name === selectedState)?.leadingCandidate === 2 ? "Obi" : "Atiku"
-                  }</p>
-                </>
-              )}
-            </div>
-          )}
+          {(() => {
+            const stats = getVoteStats(selectedState);
+            return (
+              <div className="space-y-2">
+                <p>Total Votes: {stats.total}</p>
+                <p>Tinubu: {stats.tinubu}</p>
+                <p>Obi: {stats.obi}</p>
+                <p>Atiku: {stats.atiku}</p>
+              </div>
+            );
+          })()}
         </div>
       </div>
       
-      <div className="w-2/3 grid grid-cols-6 gap-2 place-items-center">
+      <div className="w-2/3 grid grid-cols-6 gap-2">
         {filteredStates.map((state) => (
           <div
-            key={state.name}
-            className={cn(
-              'flex items-center justify-center text-center text-xs cursor-pointer transition-all duration-300',
-              'rounded hover:opacity-80',
-              getCandidateColor(state.leadingCandidate),
-              selectedState === state.name ? 'ring-2 ring-primary' : ''
-            )}
-            style={{
-              width: `${getStateSize(state.totalVotes)}px`,
-              height: `${getStateSize(state.totalVotes)}px`,
-            }}
-            onClick={() => setSelectedState(state.name)}
+            key={state}
+            className={`aspect-square p-2 rounded flex items-center justify-center text-center text-xs cursor-pointer transition-colors
+              ${selectedState === state ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/20'}`}
+            onClick={() => setSelectedState(state)}
           >
-            {state.name}
+            {state}
           </div>
         ))}
       </div>
