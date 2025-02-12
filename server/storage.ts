@@ -7,8 +7,6 @@ export interface IStorage {
   getCandidates(): Promise<Candidate[]>;
   getVotes(): Promise<Vote[]>;
   createVote(candidateId: number, voterHash: string): Promise<Vote>;
-  updateVoteCount(candidateId: number): Promise<void>; // Added function to update vote count
-  updateUser(nin: string, phoneNumber: string, hasVoted: boolean):Promise<void>
 }
 
 export class MemStorage implements IStorage {
@@ -16,13 +14,11 @@ export class MemStorage implements IStorage {
   private candidates: Map<number, Candidate>;
   private votes: Map<number, Vote>;
   private currentId: number;
-  private voteCounts: Map<number, number>; // Added to track vote counts per candidate
 
   constructor() {
     this.users = new Map();
     this.candidates = new Map();
     this.votes = new Map();
-    this.voteCounts = new Map(); // Initialize vote counts
     this.currentId = 1;
 
     // Initialize mock candidates
@@ -34,35 +30,7 @@ export class MemStorage implements IStorage {
 
     mockCandidates.forEach(candidate => {
       this.candidates.set(candidate.id, candidate);
-      this.voteCounts.set(candidate.id, 0); // Initialize vote counts to 0
     });
-
-    // Initialize with mock votes
-    const startTime = new Date();
-    startTime.setDate(startTime.getDate() - 7);
-
-    // Generate 1000 mock votes with realistic distribution
-    for (let i = 0; i < 1000; i++) {
-      const rand = Math.random();
-      let candidateId = 1;
-      if (rand > 0.4) {
-        candidateId = rand > 0.75 ? 3 : 2;
-      }
-
-      const timestamp = new Date(startTime.getTime() + Math.random() * (Date.now() - startTime.getTime()));
-      const vote: Vote = {
-        id: i + 1,
-        candidateId,
-        voterHash: `0x${nanoid(40)}`,
-        timestamp,
-        blockHeight: 1000000 + i,
-        transactionHash: `0x${nanoid(64)}`
-      };
-
-      this.votes.set(vote.id, vote);
-      this.voteCounts.set(candidateId, (this.voteCounts.get(candidateId) || 0) + 1); // Update vote count
-      this.currentId = Math.max(this.currentId, vote.id + 1);
-    }
   }
 
   async getUser(nin: string, phoneNumber: string): Promise<User | undefined> {
@@ -83,9 +51,7 @@ export class MemStorage implements IStorage {
   }
 
   async getVotes(): Promise<Vote[]> {
-    return Array.from(this.votes.values()).sort((a, b) =>
-      b.timestamp.getTime() - a.timestamp.getTime()
-    );
+    return Array.from(this.votes.values());
   }
 
   async createVote(candidateId: number, voterHash: string): Promise<Vote> {
@@ -95,24 +61,11 @@ export class MemStorage implements IStorage {
       candidateId,
       voterHash,
       timestamp: new Date(),
-      blockHeight: Math.max(...Array.from(this.votes.values()).map(v => v.blockHeight)) + 1,
-      transactionHash: `0x${nanoid(64)}`
+      blockHeight: Math.floor(Math.random() * 1000000),
+      transactionHash: nanoid(64)
     };
     this.votes.set(id, vote);
-    this.voteCounts.set(candidateId, (this.voteCounts.get(candidateId) || 0) + 1); // Update vote count
     return vote;
-  }
-
-  async updateVoteCount(candidateId: number): Promise<void> {
-    const count = this.votes.size;
-    this.voteCounts.set(candidateId, count);
-  }
-
-  async updateUser(nin: string, phoneNumber: string, hasVoted: boolean): Promise<void> {
-    const user = this.users.get(nin)
-    if(user){
-      user.hasVoted = hasVoted;
-    }
   }
 }
 

@@ -33,11 +33,7 @@ export default function Vote() {
   });
 
   const form = useForm<z.infer<typeof verifySchema>>({
-    resolver: zodResolver(verifySchema),
-    defaultValues: {
-      nin: "",
-      phoneNumber: ""
-    }
+    resolver: zodResolver(verifySchema)
   });
 
   const verifyMutation = useMutation({
@@ -75,36 +71,23 @@ export default function Vote() {
 
   const onOtpSubmit = (otp: string) => {
     if (!verificationData) return;
-    if (otp.length === 6 && /^\d+$/.test(otp)) {
-      setVerificationData({ ...verificationData, otp });
-      setStep("vote");
-    }
+    setVerificationData({ ...verificationData, otp });
+    setStep("vote");
   };
 
-  const [hasVoted, setHasVoted] = useState(false);
-
   const onVoteSubmit = () => {
-    if (!verificationData?.otp || !selectedCandidate || hasVoted) return;
-    
-    const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
-    
-    if (window.confirm(`Are you sure you want to vote for ${selectedCandidateName}? This action cannot be undone.`)) {
-      voteMutation.mutate({
-        nin: verificationData.nin,
-        phoneNumber: verificationData.phoneNumber,
-        otp: verificationData.otp,
-        candidateId: selectedCandidate
-      }, {
-        onSuccess: () => {
-          setHasVoted(true);
-        }
-      });
-    }
+    if (!verificationData?.otp || !selectedCandidate) return;
+    voteMutation.mutate({
+      nin: verificationData.nin,
+      phoneNumber: verificationData.phoneNumber,
+      otp: verificationData.otp,
+      candidateId: selectedCandidate
+    });
   };
 
   if (step === "verify") {
     return (
-      <div className="max-w-md mx-auto px-4 sm:px-6">
+      <div className="max-w-md mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>Voter Verification</CardTitle>
@@ -151,7 +134,7 @@ export default function Vote() {
 
   if (step === "otp") {
     return (
-      <div className="max-w-md mx-auto px-4 sm:px-6">
+      <div className="max-w-md mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>Enter OTP</CardTitle>
@@ -174,19 +157,6 @@ export default function Vote() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="mb-8 p-6 bg-card rounded-lg border shadow">
-        <div className="flex items-center gap-4">
-          <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-            <svg className="w-12 h-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold">Abubakar</h2>
-            <p className="text-muted-foreground">NIN: {verificationData?.nin}</p>
-          </div>
-        </div>
-      </div>
       <h1 className="text-3xl font-bold mb-8">Select a Candidate</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {candidates?.map((candidate) => (
@@ -199,11 +169,11 @@ export default function Vote() {
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                  <svg className="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
+                <img
+                  src={candidate.avatar}
+                  alt={candidate.name}
+                  className="w-16 h-16 rounded-full"
+                />
                 <div>
                   <h3 className="font-semibold">{candidate.name}</h3>
                   <p className="text-sm text-muted-foreground">{candidate.party}</p>
@@ -215,16 +185,11 @@ export default function Vote() {
       </div>
       <Button
         className="mt-8 w-full"
-        disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
+        disabled={!selectedCandidate || voteMutation.isPending}
         onClick={onVoteSubmit}
       >
         {voteMutation.isPending ? "Submitting Vote..." : "Submit Vote"}
       </Button>
-      {hasVoted && (
-        <p className="mt-4 text-center text-green-600 font-medium">
-          Your vote has been successfully cast. Thank you for participating!
-        </p>
-      )}
     </div>
   );
 }

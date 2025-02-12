@@ -16,15 +16,7 @@ export default function Explorer() {
     queryKey: ["/api/candidates"]
   });
 
-  const isLoading = !votes || !candidates;
-  
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  if (!votes || !candidates) return null;
 
   const getCandidateName = (candidateId: number) => {
     return candidates.find(c => c.id === candidateId)?.name || "Unknown";

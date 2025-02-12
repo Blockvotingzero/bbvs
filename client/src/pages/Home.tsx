@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Vote, type Candidate } from "@shared/schema";
-import NigeriaMap from "@/components/NigeriaMap"; // Import NigeriaMap component
 
 export default function Home() {
   const { data: votes, isLoading: votesLoading } = useQuery<Vote[]>({
@@ -37,7 +36,6 @@ export default function Home() {
       <div>
         <h1 className="text-3xl font-bold mb-2">Live Voting Statistics</h1>
         <p className="text-muted-foreground">Real-time overview of the current election results</p>
-        <NigeriaMap /> {/* Add NigeriaMap component here */}
       </div>
 
       <Card>
@@ -59,20 +57,20 @@ export default function Home() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {candidates.map(candidate => {
           const candidateVotes = votes.filter(vote => vote.candidateId === candidate.id).length;
           const percentage = ((candidateVotes / votes.length) * 100).toFixed(1);
-
+          
           return (
             <Card key={candidate.id}>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                    <svg className="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
+                  <img
+                    src={candidate.avatar}
+                    alt={candidate.name}
+                    className="w-16 h-16 rounded-full"
+                  />
                   <div>
                     <h3 className="font-semibold">{candidate.name}</h3>
                     <p className="text-sm text-muted-foreground">{candidate.party}</p>
