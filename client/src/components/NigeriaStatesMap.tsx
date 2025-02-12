@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type StateStats = {
   totalVotes: number;
@@ -15,6 +15,36 @@ type StateStats = {
 
 export default function NigeriaStatesMap() {
   const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [svgContent, setSvgContent] = useState<string>("");
+
+  useEffect(() => {
+    fetch('https://mapsvg.com/maps/geo-calibrated/nigeria.svg')
+      .then(response => response.text())
+      .then(data => {
+        // Process SVG content
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(data, 'image/svg+xml');
+        const svg = svgDoc.querySelector('svg');
+        if (svg) {
+          // Add responsive attributes
+          svg.setAttribute('width', '100%');
+          svg.setAttribute('height', '100%');
+          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+          svg.setAttribute('viewBox', '0 0 800 800');
+          
+          // Add hover styles
+          const style = document.createElement('style');
+          style.textContent = `
+            path { fill: #e2e8f0; transition: fill 0.3s ease; }
+            path:hover { fill: #94a3b8; cursor: pointer; }
+          `;
+          svg.appendChild(style);
+          
+          setSvgContent(svg.outerHTML);
+        }
+      })
+      .catch(error => console.error('Error loading map:', error));
+  }, []);
 
   const getStateStats = (state: string): StateStats => {
     // Simulated stats
@@ -42,8 +72,10 @@ export default function NigeriaStatesMap() {
     <div className="rounded-lg border bg-card p-6 shadow-sm">
       <div className="flex gap-6">
         <div className="w-2/3">
-          {/* Add SVG map here */}
-          <div className="aspect-square bg-muted rounded-lg" />
+          <div 
+            className="aspect-square bg-white rounded-lg p-4 border shadow-inner"
+            dangerouslySetInnerHTML={{ __html: svgContent }}
+          />
         </div>
         
         <div className="w-1/3 space-y-4">
