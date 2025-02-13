@@ -45,16 +45,37 @@ export default function Home() {
           <CardTitle>Vote Distribution</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={votesByCandidate}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="votes" fill="hsl(var(--primary))" />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="w-full h-8 bg-gray-200 rounded-full overflow-hidden">
+            {(() => {
+              const totalVotes = votes.length;
+              const apcVotes = (votes.filter(v => v.candidateId === 1).length / totalVotes) * 100;
+              const lpVotes = (votes.filter(v => v.candidateId === 2).length / totalVotes) * 100;
+              const pdpVotes = (votes.filter(v => v.candidateId === 3).length / totalVotes) * 100;
+
+              return (
+                <>
+                  <div className="flex h-full">
+                    <div style={{ width: `${apcVotes}%` }} className="bg-red-500"></div>
+                    <div style={{ width: `${lpVotes}%` }} className="bg-blue-500"></div>
+                    <div style={{ width: `${pdpVotes}%` }} className="bg-green-500"></div>
+                  </div>
+                  <div className="mt-4 flex justify-between text-sm">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                      <span>APC ({apcVotes.toFixed(1)}%)</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                      <span>LP ({lpVotes.toFixed(1)}%)</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                      <span>PDP ({pdpVotes.toFixed(1)}%)</span>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </CardContent>
       </Card>
