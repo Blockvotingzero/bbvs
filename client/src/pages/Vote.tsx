@@ -66,8 +66,6 @@ export default function Vote() {
           description: "Please check your phone for the verification code."
         });
         setLocation("/otp-verification");
-          description: "Please check your phone for the verification code."
-        });
       } else {
         setStep("vote");
       }
