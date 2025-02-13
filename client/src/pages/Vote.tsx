@@ -230,7 +230,6 @@ export default function Vote() {
                       <FormLabel>Verification Code</FormLabel>
                       <FormControl>
                         <Input 
-                          {...field}
                           type="text"
                           inputMode="numeric"
                           value={field.value}
