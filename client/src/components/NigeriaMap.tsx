@@ -24,8 +24,8 @@ export default function NigeriaMap() {
   };
 
   return (
-    <div className="flex gap-4 bg-card rounded-lg p-4 mb-6">
-      <div className="w-1/3 space-y-4">
+    <div className="flex flex-col md:flex-row gap-4 bg-card rounded-lg p-4 mb-6 min-h-[600px]">
+      <div className="w-full md:w-1/3 space-y-4 order-2 md:order-1">
         <Input 
           placeholder="Search states..." 
           value={searchQuery}
@@ -50,10 +50,10 @@ export default function NigeriaMap() {
         </div>
       </div>
 
-      <div className="w-2/3 bg-muted rounded-lg overflow-hidden">
+      <div className="w-full md:w-2/3 bg-muted rounded-lg overflow-hidden order-1 md:order-2 h-[400px] md:h-full">
         <iframe 
           src="https://blockvotingzero.github.io/"
-          className="w-full h-[500px] border-0"
+          className="w-full h-full border-0"
           title="Nigeria Map"
         />
       </div>
