@@ -51,12 +51,8 @@ export default function NigeriaMap() {
         </div>
       </div>
 
-      <div className="w-2/3">
-        <iframe 
-          src="/map.html" 
-          className="w-full h-[500px] border-none rounded-lg"
-          title="Nigeria Map"
-        />
+      <div className="w-2/3 bg-muted rounded-lg flex items-center justify-center h-[500px]">
+        <p className="text-muted-foreground">Map implementation in progress</p>
       </div>
     </div>
   );
