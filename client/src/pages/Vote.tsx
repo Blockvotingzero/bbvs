@@ -18,6 +18,10 @@ const verifySchema = z.object({
   phoneNumber: z.string().optional(),
 });
 
+const otpSchema = z.object({
+  otp: z.string().min(6, "OTP must be 6 digits").max(6, "OTP must be 6 digits").regex(/^\d+$/, "OTP must contain only numbers")
+});
+
 export default function Vote() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -34,11 +38,18 @@ export default function Vote() {
     queryKey: ["/api/candidates"]
   });
 
-  const form = useForm<z.infer<typeof verifySchema>>({
+  const verifyForm = useForm<z.infer<typeof verifySchema>>({
     resolver: zodResolver(verifySchema),
     defaultValues: {
       nin: "",
       phoneNumber: ""
+    }
+  });
+
+  const otpForm = useForm<z.infer<typeof otpSchema>>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: {
+      otp: ""
     }
   });
 
@@ -79,12 +90,12 @@ export default function Vote() {
     verifyMutation.mutate(data);
   };
 
-  const onOtpSubmit = (otp: string) => {
+  const onOtpSubmit = (data: z.infer<typeof otpSchema>) => {
     if (!verificationData) return;
 
     // Check for correct OTP (123456)
-    if (otp === "123456") {
-      setVerificationData({ ...verificationData, otp });
+    if (data.otp === "123456") {
+      setVerificationData({ ...verificationData, otp: data.otp });
       setStep("vote");
       toast({
         title: "Verification successful",
@@ -107,9 +118,10 @@ export default function Vote() {
     } else {
       toast({
         title: "Invalid OTP",
-        description: `Incorrect code, please try again. ${3 - newAttempts} attempts remaining.`,
+        description: `Incorrect code, please try again. ${3 - newAttempts} ${newAttempts === 2 ? 'attempt' : 'attempts'} remaining.`,
         variant: "destructive"
       });
+      otpForm.reset();
     }
   };
 
@@ -150,10 +162,10 @@ export default function Vote() {
             <CardTitle>Voter Verification</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onVerifySubmit)} className="space-y-4">
+            <Form {...verifyForm}>
+              <form onSubmit={verifyForm.handleSubmit(onVerifySubmit)} className="space-y-4">
                 <FormField
-                  control={form.control}
+                  control={verifyForm.control}
                   name="nin"
                   render={({ field }) => (
                     <FormItem>
@@ -166,7 +178,7 @@ export default function Vote() {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  control={verifyForm.control}
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
@@ -208,25 +220,48 @@ export default function Vote() {
             <CardTitle>Enter OTP</CardTitle>
           </CardHeader>
           <CardContent>
-            <Input
-              type="text"
-              placeholder="Enter OTP"
-              className="mb-4"
-              onChange={(e) => onOtpSubmit(e.target.value)}
-            />
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Enter the verification code sent to your phone
-              </p>
-              <Button
-                variant="link"
-                className="p-0 h-auto text-sm"
-                onClick={resendOtp}
-                disabled={verifyMutation.isPending}
-              >
-                {verifyMutation.isPending ? "Sending..." : "Didn't get the code? Resend"}
-              </Button>
-            </div>
+            <Form {...otpForm}>
+              <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-4">
+                <FormField
+                  control={otpForm.control}
+                  name="otp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Verification Code</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          maxLength={6}
+                          placeholder="Enter 6-digit code"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={otpForm.formState.isSubmitting}
+                >
+                  Verify OTP
+                </Button>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Enter the verification code sent to your phone
+                  </p>
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto text-sm"
+                    onClick={resendOtp}
+                    disabled={verifyMutation.isPending}
+                    type="button"
+                  >
+                    {verifyMutation.isPending ? "Sending..." : "Didn't get the code? Resend"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </div>
