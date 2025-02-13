@@ -14,37 +14,12 @@ export default function NigeriaMap() {
   if (!votes) return null;
 
   const getVoteStats = (state: string | null) => {
-    // Filter votes by state if a state is selected
-    const relevantVotes = state && state !== 'all' 
-      ? votes.filter(v => {
-          // In a real application, you would have state information in your vote data
-          // For simulation, we'll use a deterministic way to assign votes to states
-          const voteNumber = parseInt(v.transactionHash.slice(-2), 16);
-          const stateIndex = voteNumber % 37; // 36 states + FCT
-          const states = [
-            "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa",
-            "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti",
-            "Enugu", "FCT", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina",
-            "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo",
-            "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
-          ];
-          return states[stateIndex] === state;
-        })
-      : votes;
-
-    const tinubuVotes = relevantVotes.filter(v => v.candidateId === 1).length;
-    const obiVotes = relevantVotes.filter(v => v.candidateId === 2).length;
-    const atikuVotes = relevantVotes.filter(v => v.candidateId === 3).length;
-    const total = relevantVotes.length;
-
+    const relevantVotes = votes;
     return {
-      total,
-      tinubu: tinubuVotes,
-      obi: obiVotes,
-      atiku: atikuVotes,
-      tinubuPercentage: ((tinubuVotes / total) * 100).toFixed(1),
-      obiPercentage: ((obiVotes / total) * 100).toFixed(1),
-      atikuPercentage: ((atikuVotes / total) * 100).toFixed(1),
+      total: relevantVotes.length,
+      tinubu: relevantVotes.filter(v => v.candidateId === 1).length,
+      obi: relevantVotes.filter(v => v.candidateId === 2).length,
+      atiku: relevantVotes.filter(v => v.candidateId === 3).length,
     };
   };
 
@@ -105,9 +80,9 @@ export default function NigeriaMap() {
             return (
               <div className="space-y-2">
                 <p>Total Votes: {stats.total}</p>
-                <p>Tinubu: {stats.tinubu} ({stats.tinubuPercentage}%)</p>
-                <p>Obi: {stats.obi} ({stats.obiPercentage}%)</p>
-                <p>Atiku: {stats.atiku} ({stats.atikuPercentage}%)</p>
+                <p>Tinubu: {stats.tinubu}</p>
+                <p>Obi: {stats.obi}</p>
+                <p>Atiku: {stats.atiku}</p>
               </div>
             );
           })()}
