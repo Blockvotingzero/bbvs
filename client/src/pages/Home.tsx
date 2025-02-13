@@ -46,7 +46,7 @@ export default function Home() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
+            <div className="w-full h-6 bg-gray-200 rounded-[20px] overflow-hidden">
               {(() => {
                 const totalVotes = votes.length;
                 const apcVotes = (votes.filter(v => v.candidateId === 1).length / totalVotes) * 100;
