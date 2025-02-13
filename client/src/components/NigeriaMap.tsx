@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "./ui/input";
@@ -51,8 +50,12 @@ export default function NigeriaMap() {
         </div>
       </div>
 
-      <div className="w-2/3 bg-muted rounded-lg flex items-center justify-center h-[500px]">
-        <p className="text-muted-foreground">Map implementation in progress</p>
+      <div className="w-2/3 bg-muted rounded-lg overflow-hidden">
+        <iframe 
+          src="/map.html"
+          className="w-full h-[500px] border-0"
+          title="Nigeria Map"
+        />
       </div>
     </div>
   );
