@@ -19,6 +19,10 @@ export default function Explorer() {
     queryKey: ["/api/candidates"]
   });
 
+  const getCandidateName = useCallback((candidateId: number) => {
+    return candidates?.find(c => c.id === candidateId)?.name || "Unknown";
+  }, [candidates]);
+
   const isLoading = !votes || !candidates;
 
   if (isLoading) {
@@ -28,10 +32,6 @@ export default function Explorer() {
       </div>
     );
   }
-
-  const getCandidateName = useCallback((candidateId: number) => {
-    return candidates.find(c => c.id === candidateId)?.name || "Unknown";
-  }, [candidates]);
 
   const filteredVotes = votes.filter(vote => 
     vote.transactionHash.toLowerCase().includes(search.toLowerCase()) ||
