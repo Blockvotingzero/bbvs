@@ -11,10 +11,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { type Candidate } from "@shared/schema";
+import { Camera } from "lucide-react";
 
 const verifySchema = z.object({
   nin: z.string().min(10, "NIN must be at least 10 characters"),
-  phoneNumber: z.string().min(10, "Phone number must be at least 10 characters")
+  phoneNumber: z.string().optional(),
 });
 
 export default function Vote() {
@@ -22,9 +23,10 @@ export default function Vote() {
   const { toast } = useToast();
   const [step, setStep] = useState<"verify" | "otp" | "vote">("verify");
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
+  const [otpAttempts, setOtpAttempts] = useState(0);
   const [verificationData, setVerificationData] = useState<{
     nin: string;
-    phoneNumber: string;
+    phoneNumber?: string;
     otp?: string;
   } | null>(null);
 
@@ -47,16 +49,20 @@ export default function Vote() {
     },
     onSuccess: (data, variables) => {
       setVerificationData({ ...variables });
-      setStep("otp");
-      toast({
-        title: "OTP Sent",
-        description: "Please check your phone for the verification code."
-      });
+      if (variables.phoneNumber) {
+        setStep("otp");
+        toast({
+          title: "OTP Sent",
+          description: "Please check your phone for the verification code."
+        });
+      } else {
+        setStep("vote");
+      }
     }
   });
 
   const voteMutation = useMutation({
-    mutationFn: async (data: { nin: string; phoneNumber: string; otp: string; candidateId: number }) => {
+    mutationFn: async (data: { nin: string; phoneNumber?: string; otp?: string; candidateId: number }) => {
       const res = await apiRequest("POST", "/api/vote", data);
       return res.json();
     },
@@ -75,24 +81,52 @@ export default function Vote() {
 
   const onOtpSubmit = (otp: string) => {
     if (!verificationData) return;
-    if (otp.length === 6 && /^\d+$/.test(otp)) {
+
+    // For demo purposes, hardcode OTP as 123456
+    if (otp === "123456") {
       setVerificationData({ ...verificationData, otp });
       setStep("vote");
+    } else {
+      const newAttempts = otpAttempts + 1;
+      setOtpAttempts(newAttempts);
+
+      if (newAttempts >= 3) {
+        toast({
+          title: "Too many attempts",
+          description: "Redirecting to facial verification...",
+          variant: "destructive"
+        });
+        setTimeout(() => setLocation("/facial-verification"), 2000);
+      } else {
+        toast({
+          title: "Invalid OTP",
+          description: `Incorrect code. ${3 - newAttempts} attempts remaining.`,
+          variant: "destructive"
+        });
+      }
     }
+  };
+
+  const resendOtp = () => {
+    if (!verificationData?.phoneNumber) return;
+    verifyMutation.mutate({
+      nin: verificationData.nin,
+      phoneNumber: verificationData.phoneNumber
+    });
   };
 
   const [hasVoted, setHasVoted] = useState(false);
 
   const onVoteSubmit = () => {
-    if (!verificationData?.otp || !selectedCandidate || hasVoted) return;
-    
+    if (!selectedCandidate || hasVoted) return;
+
     const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
-    
+
     if (window.confirm(`Are you sure you want to vote for ${selectedCandidateName}? This action cannot be undone.`)) {
       voteMutation.mutate({
-        nin: verificationData.nin,
-        phoneNumber: verificationData.phoneNumber,
-        otp: verificationData.otp,
+        nin: verificationData!.nin,
+        phoneNumber: verificationData?.phoneNumber,
+        otp: verificationData?.otp,
         candidateId: selectedCandidate
       }, {
         onSuccess: () => {
@@ -130,7 +164,7 @@ export default function Vote() {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Phone Number (Optional)</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -138,9 +172,20 @@ export default function Vote() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={verifyMutation.isPending}>
-                  {verifyMutation.isPending ? "Verifying..." : "Verify"}
-                </Button>
+                <div className="space-y-2">
+                  <Button type="submit" className="w-full" disabled={verifyMutation.isPending}>
+                    {verifyMutation.isPending ? "Verifying..." : "Verify with Phone"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setLocation("/facial-verification")}
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    Verify with Face
+                  </Button>
+                </div>
               </form>
             </Form>
           </CardContent>
@@ -163,9 +208,19 @@ export default function Vote() {
               className="mb-4"
               onChange={(e) => onOtpSubmit(e.target.value)}
             />
-            <p className="text-sm text-muted-foreground">
-              Enter the verification code sent to your phone
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Enter the verification code sent to your phone
+              </p>
+              <Button
+                variant="link"
+                className="p-0 h-auto text-sm"
+                onClick={resendOtp}
+                disabled={verifyMutation.isPending}
+              >
+                {verifyMutation.isPending ? "Sending..." : "Didn't get the code? Resend"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -182,7 +237,7 @@ export default function Vote() {
             </svg>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold">Abubakar</h2>
+            <h2 className="text-2xl font-semibold">Voter</h2>
             <p className="text-muted-foreground">NIN: {verificationData?.nin}</p>
           </div>
         </div>
