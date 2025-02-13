@@ -82,32 +82,34 @@ export default function Vote() {
   const onOtpSubmit = (otp: string) => {
     if (!verificationData) return;
 
-    // For demo purposes, hardcode OTP as 123456
+    // Check for correct OTP (123456)
     if (otp === "123456") {
       setVerificationData({ ...verificationData, otp });
       setStep("vote");
       toast({
         title: "Verification successful",
-        description: "Proceeding to vote..."
+        description: "You can now proceed to vote"
       });
-    } else {
-      const newAttempts = otpAttempts + 1;
-      setOtpAttempts(newAttempts);
+      return;
+    }
 
-      if (newAttempts >= 3) {
-        toast({
-          title: "Too many failed attempts",
-          description: "Redirecting to facial verification...",
-          variant: "destructive"
-        });
-        setTimeout(() => setLocation("/facial-verification"), 2000);
-      } else {
-        toast({
-          title: "Invalid OTP",
-          description: `Incorrect code, please try again. ${3 - newAttempts} attempts remaining.`,
-          variant: "destructive"
-        });
-      }
+    // Handle incorrect OTP
+    const newAttempts = otpAttempts + 1;
+    setOtpAttempts(newAttempts);
+
+    if (newAttempts >= 3) {
+      toast({
+        title: "Too many failed attempts",
+        description: "Redirecting to facial verification...",
+        variant: "destructive"
+      });
+      setTimeout(() => setLocation("/facial-verification"), 2000);
+    } else {
+      toast({
+        title: "Invalid OTP",
+        description: `Incorrect code, please try again. ${3 - newAttempts} attempts remaining.`,
+        variant: "destructive"
+      });
     }
   };
 
