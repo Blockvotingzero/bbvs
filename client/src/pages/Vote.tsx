@@ -86,13 +86,17 @@ export default function Vote() {
     if (otp === "123456") {
       setVerificationData({ ...verificationData, otp });
       setStep("vote");
+      toast({
+        title: "Verification successful",
+        description: "Proceeding to vote..."
+      });
     } else {
       const newAttempts = otpAttempts + 1;
       setOtpAttempts(newAttempts);
 
       if (newAttempts >= 3) {
         toast({
-          title: "Too many attempts",
+          title: "Too many failed attempts",
           description: "Redirecting to facial verification...",
           variant: "destructive"
         });
@@ -100,7 +104,7 @@ export default function Vote() {
       } else {
         toast({
           title: "Invalid OTP",
-          description: `Incorrect code. ${3 - newAttempts} attempts remaining.`,
+          description: `Incorrect code, please try again. ${3 - newAttempts} attempts remaining.`,
           variant: "destructive"
         });
       }
