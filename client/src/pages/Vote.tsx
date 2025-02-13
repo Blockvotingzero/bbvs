@@ -11,15 +11,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { type Candidate } from "@shared/schema";
-import { Camera } from "lucide-react";
 
 const verifySchema = z.object({
   nin: z.string().min(10, "NIN must be at least 10 characters"),
-  phoneNumber: z.string().optional(),
-});
-
-const otpSchema = z.object({
-  otp: z.string().min(6, "OTP must be 6 digits").max(6, "OTP must be 6 digits").regex(/^\d+$/, "OTP must contain only numbers")
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 characters")
 });
 
 export default function Vote() {
@@ -27,10 +22,9 @@ export default function Vote() {
   const { toast } = useToast();
   const [step, setStep] = useState<"verify" | "otp" | "vote">("verify");
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
-  const [otpAttempts, setOtpAttempts] = useState(0);
   const [verificationData, setVerificationData] = useState<{
     nin: string;
-    phoneNumber?: string;
+    phoneNumber: string;
     otp?: string;
   } | null>(null);
 
@@ -38,18 +32,11 @@ export default function Vote() {
     queryKey: ["/api/candidates"]
   });
 
-  const verifyForm = useForm<z.infer<typeof verifySchema>>({
+  const form = useForm<z.infer<typeof verifySchema>>({
     resolver: zodResolver(verifySchema),
     defaultValues: {
       nin: "",
       phoneNumber: ""
-    }
-  });
-
-  const otpForm = useForm<z.infer<typeof otpSchema>>({
-    resolver: zodResolver(otpSchema),
-    defaultValues: {
-      otp: ""
     }
   });
 
@@ -60,20 +47,16 @@ export default function Vote() {
     },
     onSuccess: (data, variables) => {
       setVerificationData({ ...variables });
-      if (variables.phoneNumber) {
-        toast({
-          title: "OTP Sent",
-          description: "Please check your phone for the verification code."
-        });
-        setLocation("/otp-verification");
-      } else {
-        setStep("vote");
-      }
+      setStep("otp");
+      toast({
+        title: "OTP Sent",
+        description: "Please check your phone for the verification code."
+      });
     }
   });
 
   const voteMutation = useMutation({
-    mutationFn: async (data: { nin: string; phoneNumber?: string; otp?: string; candidateId: number }) => {
+    mutationFn: async (data: { nin: string; phoneNumber: string; otp: string; candidateId: number }) => {
       const res = await apiRequest("POST", "/api/vote", data);
       return res.json();
     },
@@ -90,61 +73,26 @@ export default function Vote() {
     verifyMutation.mutate(data);
   };
 
-  const onOtpSubmit = (data: z.infer<typeof otpSchema>) => {
+  const onOtpSubmit = (otp: string) => {
     if (!verificationData) return;
-
-    // Check for correct OTP (123456)
-    if (data.otp === "123456") {
-      setVerificationData({ ...verificationData, otp: data.otp });
+    if (otp.length === 6 && /^\d+$/.test(otp)) {
+      setVerificationData({ ...verificationData, otp });
       setStep("vote");
-      toast({
-        title: "Verification successful",
-        description: "You can now proceed to vote"
-      });
-      return;
     }
-
-    // Handle incorrect OTP
-    const newAttempts = otpAttempts + 1;
-    setOtpAttempts(newAttempts);
-
-    if (newAttempts >= 3) {
-      toast({
-        title: "Too many failed attempts",
-        description: "Redirecting to facial verification...",
-        variant: "destructive"
-      });
-      setTimeout(() => setLocation("/facial-verification"), 2000);
-    } else {
-      toast({
-        title: "Invalid OTP",
-        description: `Incorrect code, please try again. ${3 - newAttempts} ${newAttempts === 2 ? 'attempt' : 'attempts'} remaining.`,
-        variant: "destructive"
-      });
-      otpForm.reset();
-    }
-  };
-
-  const resendOtp = () => {
-    if (!verificationData?.phoneNumber) return;
-    verifyMutation.mutate({
-      nin: verificationData.nin,
-      phoneNumber: verificationData.phoneNumber
-    });
   };
 
   const [hasVoted, setHasVoted] = useState(false);
 
   const onVoteSubmit = () => {
-    if (!selectedCandidate || hasVoted) return;
-
+    if (!verificationData?.otp || !selectedCandidate || hasVoted) return;
+    
     const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
-
+    
     if (window.confirm(`Are you sure you want to vote for ${selectedCandidateName}? This action cannot be undone.`)) {
       voteMutation.mutate({
-        nin: verificationData!.nin,
-        phoneNumber: verificationData?.phoneNumber,
-        otp: verificationData?.otp,
+        nin: verificationData.nin,
+        phoneNumber: verificationData.phoneNumber,
+        otp: verificationData.otp,
         candidateId: selectedCandidate
       }, {
         onSuccess: () => {
@@ -162,10 +110,10 @@ export default function Vote() {
             <CardTitle>Voter Verification</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...verifyForm}>
-              <form onSubmit={verifyForm.handleSubmit(onVerifySubmit)} className="space-y-4">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onVerifySubmit)} className="space-y-4">
                 <FormField
-                  control={verifyForm.control}
+                  control={form.control}
                   name="nin"
                   render={({ field }) => (
                     <FormItem>
@@ -178,11 +126,11 @@ export default function Vote() {
                   )}
                 />
                 <FormField
-                  control={verifyForm.control}
+                  control={form.control}
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number (Optional)</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -190,20 +138,9 @@ export default function Vote() {
                     </FormItem>
                   )}
                 />
-                <div className="space-y-2">
-                  <Button type="submit" className="w-full" disabled={verifyMutation.isPending}>
-                    {verifyMutation.isPending ? "Verifying..." : "Verify with Phone"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setLocation("/facial-verification")}
-                  >
-                    <Camera className="mr-2 h-4 w-4" />
-                    Verify with Face
-                  </Button>
-                </div>
+                <Button type="submit" className="w-full" disabled={verifyMutation.isPending}>
+                  {verifyMutation.isPending ? "Verifying..." : "Verify"}
+                </Button>
               </form>
             </Form>
           </CardContent>
@@ -220,55 +157,15 @@ export default function Vote() {
             <CardTitle>Enter OTP</CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...otpForm}>
-              <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-4">
-                <FormField
-                  control={otpForm.control}
-                  name="otp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Verification Code</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          inputMode="numeric"
-                          value={field.value}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
-                            field.onChange(value);
-                          }}
-                          maxLength={6}
-                          placeholder="Enter 6-digit code"
-                          className="text-center tracking-widest"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={otpForm.formState.isSubmitting}
-                >
-                  Verify OTP
-                </Button>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Enter the verification code sent to your phone
-                  </p>
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto text-sm"
-                    onClick={resendOtp}
-                    disabled={verifyMutation.isPending}
-                    type="button"
-                  >
-                    {verifyMutation.isPending ? "Sending..." : "Didn't get the code? Resend"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+            <Input
+              type="text"
+              placeholder="Enter OTP"
+              className="mb-4"
+              onChange={(e) => onOtpSubmit(e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              Enter the verification code sent to your phone
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -285,7 +182,7 @@ export default function Vote() {
             </svg>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold">Voter</h2>
+            <h2 className="text-2xl font-semibold">Abubakar</h2>
             <p className="text-muted-foreground">NIN: {verificationData?.nin}</p>
           </div>
         </div>

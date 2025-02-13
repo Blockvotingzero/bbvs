@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Vote, type Candidate } from "@shared/schema";
-import NigeriaMap from "@/components/NigeriaMap";
+import NigeriaMap from "@/components/NigeriaMap"; // Import NigeriaMap component
 
 export default function Home() {
   const { data: votes, isLoading: votesLoading } = useQuery<Vote[]>({
@@ -36,7 +37,7 @@ export default function Home() {
       <div>
         <h1 className="text-3xl font-bold mb-2">Live Voting Statistics</h1>
         <p className="text-muted-foreground">Real-time overview of the current election results</p>
-        <NigeriaMap />
+        <NigeriaMap /> {/* Add NigeriaMap component here */}
       </div>
 
       <Card>
@@ -45,7 +46,7 @@ export default function Home() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden relative">
+            <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
               {(() => {
                 const totalVotes = votes.length;
                 const apcVotes = (votes.filter(v => v.candidateId === 1).length / totalVotes) * 100;
@@ -53,27 +54,17 @@ export default function Home() {
                 const pdpVotes = (votes.filter(v => v.candidateId === 3).length / totalVotes) * 100;
 
                 return (
-                  <div className="flex h-full w-full">
-                    <div style={{ width: `${apcVotes}%` }} className="bg-red-500 relative group">
-                      <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 text-xs">
-                        {apcVotes.toFixed(1)}%
-                      </span>
+                  <>
+                    <div className="flex h-full">
+                      <div style={{ width: `${apcVotes}%` }} className="bg-red-500"></div>
+                      <div style={{ width: `${lpVotes}%` }} className="bg-blue-500"></div>
+                      <div style={{ width: `${pdpVotes}%` }} className="bg-green-500"></div>
                     </div>
-                    <div style={{ width: `${lpVotes}%` }} className="bg-blue-500 relative group">
-                      <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 text-xs">
-                        {lpVotes.toFixed(1)}%
-                      </span>
-                    </div>
-                    <div style={{ width: `${pdpVotes}%` }} className="bg-green-500 relative group">
-                      <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 text-xs">
-                        {pdpVotes.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
+                  </>
                 );
               })()}
             </div>
-            <div className="flex justify-center gap-4 text-sm mt-6">
+            <div className="flex justify-center gap-4 text-sm">
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-red-500 rounded-[20%] mr-1"></div>
                 <span>APC</span>

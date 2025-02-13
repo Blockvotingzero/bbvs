@@ -2,15 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { type Vote, type Candidate } from "@shared/schema";
-
-const ITEMS_PER_PAGE = 10;
 
 export default function Explorer() {
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
+  
   const { data: votes } = useQuery<Vote[]>({
     queryKey: ["/api/votes"]
   });
@@ -19,12 +16,8 @@ export default function Explorer() {
     queryKey: ["/api/candidates"]
   });
 
-  const getCandidateName = useCallback((candidateId: number) => {
-    return candidates?.find(c => c.id === candidateId)?.name || "Unknown";
-  }, [candidates]);
-
   const isLoading = !votes || !candidates;
-
+  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[50vh]">
@@ -33,14 +26,14 @@ export default function Explorer() {
     );
   }
 
+  const getCandidateName = (candidateId: number) => {
+    return candidates.find(c => c.id === candidateId)?.name || "Unknown";
+  };
+
   const filteredVotes = votes.filter(vote => 
     vote.transactionHash.toLowerCase().includes(search.toLowerCase()) ||
     getCandidateName(vote.candidateId).toLowerCase().includes(search.toLowerCase())
   );
-
-  const totalPages = Math.ceil(filteredVotes.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedVotes = filteredVotes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-8">
@@ -81,33 +74,12 @@ export default function Explorer() {
       <Card>
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <Input
-              placeholder="Search by transaction hash or candidate name"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="max-w-sm"
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded bg-primary text-primary-foreground disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-3 py-1">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded bg-primary text-primary-foreground disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Input
+            placeholder="Search by transaction hash or candidate name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="max-w-sm"
+          />
         </CardHeader>
         <CardContent>
           <Table>
@@ -120,7 +92,7 @@ export default function Explorer() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedVotes.map((vote) => (
+              {filteredVotes.map((vote) => (
                 <TableRow key={vote.id}>
                   <TableCell className="font-mono">
                     {vote.transactionHash.slice(0, 16)}...
