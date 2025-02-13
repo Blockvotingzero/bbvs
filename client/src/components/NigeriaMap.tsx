@@ -1,21 +1,12 @@
-
 import { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "./ui/input";
 import { type Vote } from "@shared/schema";
 
-const nigerianStates = [
-  'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
-  'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe',
-  'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara',
-  'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau',
-  'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
-];
-
 export default function NigeriaMap() {
   const [selectedState, setSelectedState] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const { data: votes } = useQuery<Vote[]>({
     queryKey: ["/api/votes"]
   });
@@ -31,10 +22,6 @@ export default function NigeriaMap() {
       atiku: relevantVotes.filter(v => v.candidateId === 3).length,
     };
   };
-
-  const filteredStates = nigerianStates.filter(state => 
-    state.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="flex gap-4 bg-card rounded-lg p-4 mb-6">
@@ -62,18 +49,13 @@ export default function NigeriaMap() {
           })()}
         </div>
       </div>
-      
-      <div className="w-2/3 grid grid-cols-6 gap-2">
-        {filteredStates.map((state) => (
-          <div
-            key={state}
-            className={`aspect-square p-2 rounded flex items-center justify-center text-center text-xs cursor-pointer transition-colors
-              ${selectedState === state ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-primary/20'}`}
-            onClick={() => setSelectedState(state)}
-          >
-            {state}
-          </div>
-        ))}
+
+      <div className="w-2/3">
+        <iframe 
+          src="/map.html" 
+          className="w-full h-[500px] border-none rounded-lg"
+          title="Nigeria Map"
+        />
       </div>
     </div>
   );
