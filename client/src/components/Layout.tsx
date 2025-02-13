@@ -10,47 +10,48 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
-        <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <nav className="container mx-auto px-4 h-16 flex items-center">
           <Link href="/">
             <a className="text-2xl font-bold text-primary">
               BlockVote
             </a>
           </Link>
 
-          <ul className="flex gap-6">
-            <li>
-              <Link href="/">
-                <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors flex items-center gap-2`}>
-                  Statistics
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/vote">
-                <a className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                  Vote
-                </a>
-              </Link>
-            </li>
-            <li>
-              <Link href="/explorer">
-                <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                  Explorer
-                </a>
-              </Link>
-            </li>
-          </ul>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="ml-4"
-          >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <div className="flex-1 flex justify-end items-center gap-6">
+            <ul className="flex gap-6">
+              <li>
+                <Link href="/">
+                  <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors flex items-center gap-2`}>
+                    Statistics
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/vote">
+                  <a className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+                    Vote
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/explorer">
+                  <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
+                    Explorer
+                  </a>
+                </Link>
+              </li>
+            </ul>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </div>
         </nav>
       </header>
 
