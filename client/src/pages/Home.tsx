@@ -55,16 +55,10 @@ export default function Home() {
 
                 return (
                   <>
-                    <div className="flex h-full relative">
-                      <div style={{ width: `${apcVotes}%` }} className="bg-red-500">
-                        <span className="absolute text-xs text-white left-1 top-1/2 -translate-y-1/2">APC</span>
-                      </div>
-                      <div style={{ width: `${lpVotes}%` }} className="bg-blue-500">
-                        <span className="absolute text-xs text-white left-[calc(33%+8px)] top-1/2 -translate-y-1/2">LP</span>
-                      </div>
-                      <div style={{ width: `${pdpVotes}%` }} className="bg-green-500">
-                        <span className="absolute text-xs text-white left-[calc(66%+8px)] top-1/2 -translate-y-1/2">PDP</span>
-                      </div>
+                    <div className="flex h-full">
+                      <div style={{ width: `${apcVotes}%` }} className="bg-red-500"></div>
+                      <div style={{ width: `${lpVotes}%` }} className="bg-blue-500"></div>
+                      <div style={{ width: `${pdpVotes}%` }} className="bg-green-500"></div>
                     </div>
                   </>
                 );
@@ -72,15 +66,15 @@ export default function Home() {
             </div>
             <div className="flex justify-center gap-4 text-sm">
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-red-500 mr-1"></div>
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
                 <span>APC</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-blue-500 mr-1"></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
                 <span>LP</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 mr-1"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
                 <span>PDP</span>
               </div>
             </div>
