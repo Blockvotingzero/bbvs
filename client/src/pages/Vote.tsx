@@ -61,10 +61,11 @@ export default function Vote() {
     onSuccess: (data, variables) => {
       setVerificationData({ ...variables });
       if (variables.phoneNumber) {
-        otpForm.reset({ otp: "" });
-        setStep("otp");
         toast({
           title: "OTP Sent",
+          description: "Please check your phone for the verification code."
+        });
+        setLocation("/otp-verification");
           description: "Please check your phone for the verification code."
         });
       } else {
