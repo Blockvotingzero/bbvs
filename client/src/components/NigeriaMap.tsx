@@ -52,7 +52,7 @@ export default function NigeriaMap() {
 
       <div className="w-2/3">
         <iframe 
-          src="/map.html" 
+          src={window.location.origin + "/map.html"} 
           className="w-full h-[500px] border-none rounded-lg"
           title="Nigeria Map"
         />
