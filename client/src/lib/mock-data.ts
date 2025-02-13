@@ -49,11 +49,11 @@ const stateVotes = {
 const generateMockVotes = () => {
   const votes: Vote[] = [];
   let id = 1;
-  
+
   // Start time: 7 days ago
   const startTime = new Date();
   startTime.setDate(startTime.getDate() - 7);
-  
+
   // Generate votes based on state statistics
   Object.values(stateVotes).forEach(stateVote => {
     // APC votes
@@ -82,23 +82,6 @@ const createVote = (id: number, candidateId: number, startTime: Date): Vote => {
     blockHeight: 1000000 + id,
     transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
   };
-};
-
-    // Generate timestamp between start time and now
-    const timestamp = new Date(startTime.getTime() + Math.random() * (Date.now() - startTime.getTime()));
-
-    votes.push({
-      id: i + 1,
-      candidateId,
-      voterHash: `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
-      timestamp,
-      blockHeight: 1000000 + i, // Simulating increasing block heights
-      transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
-    });
-  }
-
-  // Sort by timestamp
-  return votes.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 };
 
 export const mockVotes = generateMockVotes();
