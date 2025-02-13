@@ -31,7 +31,7 @@ export default function NigeriaMap() {
             <SelectValue placeholder="Search states..." />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Nigeria</SelectItem>
+            <SelectItem value="all">All Nigeria</SelectItem>
             <SelectItem value="Abia">Abia</SelectItem>
             <SelectItem value="Adamawa">Adamawa</SelectItem>
             <SelectItem value="Akwa Ibom">Akwa Ibom</SelectItem>
