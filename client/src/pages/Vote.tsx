@@ -230,15 +230,18 @@ export default function Vote() {
                       <FormLabel>Verification Code</FormLabel>
                       <FormControl>
                         <Input 
-                          {...field} 
+                          {...field}
+                          type="text"
+                          inputMode="numeric"
                           value={field.value}
                           onChange={(e) => {
+                            // Only allow numbers and limit to 6 digits
                             const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
                             field.onChange(value);
                           }}
                           maxLength={6}
-                          type="text"
                           placeholder="Enter 6-digit code"
+                          className="text-center tracking-widest"
                         />
                       </FormControl>
                       <FormMessage />
