@@ -229,12 +229,11 @@ export default function Vote() {
                     <FormItem>
                       <FormLabel>Verification Code</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           type="text"
                           inputMode="numeric"
                           value={field.value}
                           onChange={(e) => {
-                            // Only allow numbers and limit to 6 digits
                             const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
                             field.onChange(value);
                           }}
@@ -247,8 +246,8 @@ export default function Vote() {
                     </FormItem>
                   )}
                 />
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full"
                   disabled={otpForm.formState.isSubmitting}
                 >
