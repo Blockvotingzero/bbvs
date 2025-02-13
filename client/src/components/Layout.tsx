@@ -5,6 +5,7 @@ import { useTheme } from "@/hooks/use-theme";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,10 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              const { toggleTheme } = useTheme();
-              toggleTheme();
-            }}
+            onClick={toggleTheme}
             className="ml-4"
           >
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
