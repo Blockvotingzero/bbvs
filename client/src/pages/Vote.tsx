@@ -61,6 +61,7 @@ export default function Vote() {
     onSuccess: (data, variables) => {
       setVerificationData({ ...variables });
       if (variables.phoneNumber) {
+        otpForm.reset({ otp: "" });
         setStep("otp");
         toast({
           title: "OTP Sent",
