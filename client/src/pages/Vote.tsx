@@ -231,7 +231,13 @@ export default function Vote() {
                       <FormControl>
                         <Input 
                           {...field} 
+                          value={field.value}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                            field.onChange(value);
+                          }}
                           maxLength={6}
+                          type="text"
                           placeholder="Enter 6-digit code"
                         />
                       </FormControl>
