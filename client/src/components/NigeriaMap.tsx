@@ -52,7 +52,7 @@ export default function NigeriaMap() {
 
       <div className="w-2/3 bg-muted rounded-lg overflow-hidden">
         <iframe 
-          src="https://raw.githubusercontent.com/Blockvotingzero/Blockvotingzero/main/map.html"
+          src="https://blockvotingzero.github.io/"
           className="w-full h-[500px] border-0"
           title="Nigeria Map"
         />
