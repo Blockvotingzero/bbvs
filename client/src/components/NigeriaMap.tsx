@@ -50,15 +50,18 @@ export default function NigeriaMap() {
         </div>
       </div>
 
-      <div className="w-full md:w-2/3 bg-muted rounded-lg overflow-hidden order-1 md:order-2" style={{ aspectRatio: '4/3' }}>
+      <div className="w-full md:w-2/3 bg-muted rounded-lg overflow-hidden order-1 md:order-2" style={{ aspectRatio: '1/1' }}>
         <iframe 
           src="https://blockvotingzero.github.io/"
           className="w-full h-full border-0"
           style={{
-            transform: 'scale(0.95)',
+            transform: 'scale(0.9)',
             transformOrigin: 'center center',
-            width: '100%',
-            height: '100%'
+            width: '600px',
+            height: '600px',
+            maxWidth: '100%',
+            margin: '0 auto',
+            display: 'block'
           }}
           title="Nigeria Map"
         />
