@@ -1,8 +1,6 @@
-
 import { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { type Vote } from "@shared/schema";
 
 export default function NigeriaMap() {
@@ -14,14 +12,6 @@ export default function NigeriaMap() {
   });
 
   if (!votes) return null;
-
-  const states = [
-    "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue",
-    "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu",
-    "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi",
-    "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo",
-    "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"
-  ].filter(state => state.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const getVoteStats = (state: string | null) => {
     const relevantVotes = votes;
@@ -42,19 +32,6 @@ export default function NigeriaMap() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-4"
         />
-        <Select value={selectedState} onValueChange={setSelectedState}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a state" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">All States</SelectItem>
-            {states.map((state) => (
-              <SelectItem key={state} value={state}>
-                {state}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <div className="bg-muted p-4 rounded-lg">
           <h3 className="font-semibold mb-2">
             {selectedState || 'National'} Statistics
@@ -64,9 +41,9 @@ export default function NigeriaMap() {
             return (
               <div className="space-y-2">
                 <p>Total Votes: {stats.total}</p>
-                <p>Tinubu (APC): {stats.tinubu}</p>
-                <p>Obi (LP): {stats.obi}</p>
-                <p>Atiku (PDP): {stats.atiku}</p>
+                <p>Tinubu: {stats.tinubu}</p>
+                <p>Obi: {stats.obi}</p>
+                <p>Atiku: {stats.atiku}</p>
               </div>
             );
           })()}
