@@ -66,15 +66,15 @@ export default function Home() {
             </div>
             <div className="flex justify-center gap-4 text-sm">
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                <div className="w-2 h-2 bg-red-500 rounded-[20%] mr-1"></div>
                 <span>APC</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-1"></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-[20%] mr-1"></div>
                 <span>LP</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-[20%] mr-1"></div>
                 <span>PDP</span>
               </div>
             </div>
