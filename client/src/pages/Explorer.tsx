@@ -1,12 +1,16 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { type Vote, type Candidate } from "@shared/schema";
 
 export default function Explorer() {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
   
   const { data: votes } = useQuery<Vote[]>({
     queryKey: ["/api/votes"]
@@ -33,6 +37,12 @@ export default function Explorer() {
   const filteredVotes = votes.filter(vote => 
     vote.transactionHash.toLowerCase().includes(search.toLowerCase()) ||
     getCandidateName(vote.candidateId).toLowerCase().includes(search.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredVotes.length / ITEMS_PER_PAGE);
+  const paginatedVotes = filteredVotes.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
   );
 
   return (
@@ -92,7 +102,7 @@ export default function Explorer() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredVotes.map((vote) => (
+              {paginatedVotes.map((vote) => (
                 <TableRow key={vote.id}>
                   <TableCell className="font-mono">
                     {vote.transactionHash.slice(0, 16)}...
@@ -106,6 +116,22 @@ export default function Explorer() {
               ))}
             </TableBody>
           </Table>
+          
+          <div className="flex justify-between items-center mt-4">
+            <Button 
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <span>Page {page} of {totalPages}</span>
+            <Button 
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
