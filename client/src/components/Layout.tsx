@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </a>
           </Link>
 
-          <ul className="flex gap-6">
+          <ul className="flex gap-6 justify-end"> {/* Added justify-end */}
             <li>
               <Link href="/">
                 <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors flex items-center gap-2`}>
@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </a>
               </Link>
             </li>
-            
+
             <li>
               <Link href="/explorer">
                 <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
