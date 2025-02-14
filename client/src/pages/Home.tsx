@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type Vote, type Candidate } from "@shared/schema";
-import NigeriaMap from "@/components/NigeriaMap"; // Import NigeriaMap component
+import NigeriaMap from "@/components/NigeriaMap";
+import LiveVotes from "@/components/LiveVotes"; // Import NigeriaMap component
 
 export default function Home() {
   const { data: votes, isLoading: votesLoading } = useQuery<Vote[]>({
@@ -40,11 +41,13 @@ export default function Home() {
         <NigeriaMap /> {/* Add NigeriaMap component here */}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Vote Distribution</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Vote Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
           <div className="space-y-2">
             <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
               {(() => {
@@ -81,6 +84,13 @@ export default function Home() {
           </div>
         </CardContent>
       </Card>
+        </div>
+        <Card>
+          <CardContent className="p-0">
+            <LiveVotes />
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {candidates.map(candidate => {
