@@ -26,13 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </a>
               </Link>
             </li>
-            <li>
-              <Link href="/vote">
-                <a className={`${location === "/vote" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                  Vote
-                </a>
-              </Link>
-            </li>
+            
             <li>
               <Link href="/explorer">
                 <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
