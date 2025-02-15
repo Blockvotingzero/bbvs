@@ -33,10 +33,12 @@ export default function Vote() {
       // Simulate blockchain processing time
       await new Promise(resolve => setTimeout(resolve, 1500));
       const res = await apiRequest("POST", "/api/vote", data);
+      if (!res.ok) {
+        throw new Error("Failed to submit vote");
+      }
       return res.json();
     },
     onSuccess: (data) => {
-      // Generate a random Ethereum-style hash
       const hash = "0x" + Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map(b => b.toString(16).padStart(2, "0"))
         .join("")
@@ -45,9 +47,18 @@ export default function Vote() {
       setHasVoted(true);
       setShowConfirmDialog(false);
       setShowSuccessDialog(true);
+      setSelectedCandidate(null); // Reset selection
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
+      });
+    },
+    onError: (error) => {
+      setShowConfirmDialog(false);
+      toast({
+        title: "Error",
+        description: "Failed to submit vote. Please try again.",
+        variant: "destructive"
       });
     }
   });
@@ -117,8 +128,18 @@ export default function Vote() {
         className="mt-8 w-full"
         disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
         onClick={onVoteSubmit}
+        variant={hasVoted ? "secondary" : "default"}
       >
-        {voteMutation.isPending ? "Submitting Vote..." : hasVoted ? "Vote Submitted" : "Submit Vote"}
+        {voteMutation.isPending ? (
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Submitting Vote...
+          </div>
+        ) : hasVoted ? (
+          "Vote Submitted"
+        ) : (
+          "Submit Vote"
+        )}
       </Button>
 
       {/* Confirmation Dialog */}
@@ -191,8 +212,8 @@ export default function Vote() {
         </DialogContent>
       </Dialog>
 
-      {hasVoted && (
-        <Card className="mt-8">
+      {hasVoted && voteHash && (
+        <Card className="mt-8 border-primary">
           <CardContent className="pt-6">
             <h3 className="text-xl font-semibold mb-4">Vote Confirmation</h3>
             <div className="space-y-4">
