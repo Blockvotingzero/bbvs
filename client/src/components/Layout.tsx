@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Vote } from "lucide-react";
 import { Button } from "./ui/button";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -29,6 +29,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
                 Explorer
               </a>
+            </Link>
+
+            <Link href="/login">
+              <Button variant="default" className="gap-2">
+                <Vote className="h-4 w-4" />
+                Vote
+              </Button>
             </Link>
 
             <Button

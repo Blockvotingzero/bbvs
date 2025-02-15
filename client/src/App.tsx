@@ -4,7 +4,9 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-
+import Login from "./pages/Login";
+import OTPVerification from "./pages/OTPVerification";
+import LivenessCheck from "./pages/LivenessCheck";
 import Explorer from "./pages/Explorer";
 import NotFound from "./pages/not-found";
 
@@ -13,7 +15,9 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
-        
+        <Route path="/login" component={Login} />
+        <Route path="/otp" component={OTPVerification} />
+        <Route path="/liveness" component={LivenessCheck} />
         <Route path="/explorer" component={Explorer} />
         <Route component={NotFound} />
       </Switch>
