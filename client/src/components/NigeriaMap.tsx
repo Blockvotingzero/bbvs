@@ -14,12 +14,12 @@ export default function NigeriaMap() {
   if (!votes) return null;
 
   const getVoteStats = (state: string | null) => {
-    const relevantVotes = votes;
+    const stateVotes = state === "all" || !state ? votes : votes.filter(v => v.state === state);
     return {
-      total: relevantVotes.length,
-      tinubu: relevantVotes.filter(v => v.candidateId === 1).length,
-      obi: relevantVotes.filter(v => v.candidateId === 2).length,
-      atiku: relevantVotes.filter(v => v.candidateId === 3).length,
+      total: stateVotes.length,
+      tinubu: stateVotes.filter(v => v.candidateId === 1).length,
+      obi: stateVotes.filter(v => v.candidateId === 2).length,
+      atiku: stateVotes.filter(v => v.candidateId === 3).length,
     };
   };
 
