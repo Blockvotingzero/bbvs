@@ -42,51 +42,49 @@ export default function Home() {
       </div>
 
       <div className="space-y-4 mb-8">
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Vote Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-          <div className="space-y-2">
-            <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
-              {(() => {
-                const totalVotes = votes.length;
-                const apcVotes = (votes.filter(v => v.candidateId === 1).length / totalVotes) * 100;
-                const lpVotes = (votes.filter(v => v.candidateId === 2).length / totalVotes) * 100;
-                const pdpVotes = (votes.filter(v => v.candidateId === 3).length / totalVotes) * 100;
-
-                return (
-                  <>
-                    <div className="flex h-full">
-                      <div style={{ width: `${apcVotes}%` }} className="bg-red-500"></div>
-                      <div style={{ width: `${lpVotes}%` }} className="bg-blue-500"></div>
-                      <div style={{ width: `${pdpVotes}%` }} className="bg-green-500"></div>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-            <div className="flex justify-center gap-4 text-sm">
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-red-500 rounded-[20%] mr-1"></div>
-                <span>APC</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-[20%] mr-1"></div>
-                <span>LP</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-[20%] mr-1"></div>
-                <span>PDP</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-        </div>
-        <Card className="w-full">
+        <Card>
+          <CardHeader>
+            <CardTitle>Vote Distribution</CardTitle>
+          </CardHeader>
           <CardContent>
+            <div className="space-y-2">
+              <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
+                {(() => {
+                  const totalVotes = votes.length;
+                  const apcVotes = (votes.filter(v => v.candidateId === 1).length / totalVotes) * 100;
+                  const lpVotes = (votes.filter(v => v.candidateId === 2).length / totalVotes) * 100;
+                  const pdpVotes = (votes.filter(v => v.candidateId === 3).length / totalVotes) * 100;
+
+                  return (
+                    <>
+                      <div className="flex h-full">
+                        <div style={{ width: `${apcVotes}%` }} className="bg-red-500"></div>
+                        <div style={{ width: `${lpVotes}%` }} className="bg-blue-500"></div>
+                        <div style={{ width: `${pdpVotes}%` }} className="bg-green-500"></div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+              <div className="flex justify-center gap-4 text-sm">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-red-500 rounded-[20%] mr-1"></div>
+                  <span>APC</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-500 rounded-[20%] mr-1"></div>
+                  <span>LP</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-[20%] mr-1"></div>
+                  <span>PDP</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="w-full">
+          <CardContent className="p-4">
             <LiveVotes />
           </CardContent>
         </Card>

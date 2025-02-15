@@ -15,7 +15,10 @@ export default function LiveVotes() {
     let currentIndex = 0;
     const interval = setInterval(() => {
       const nextVote = votes[currentIndex];
-      setDisplayedVotes([nextVote]);
+      setDisplayedVotes(prev => {
+        if (prev[0]?.id === nextVote.id) return prev;
+        return [nextVote];
+      });
       currentIndex = (currentIndex + 1) % votes.length;
     }, 3000);
 
@@ -25,13 +28,17 @@ export default function LiveVotes() {
   return (
     <div className="w-full">
       <h3 className="text-lg font-semibold mb-4">Live Votes</h3>
-      <div className="relative h-24 overflow-hidden">
+      <div className="h-[100px] relative overflow-hidden">
         {displayedVotes.map((vote, i) => (
           <div
             key={`${vote.id}-${i}`}
             className="absolute w-full transform transition-all duration-500 ease-in-out animate-slide-down"
+            style={{
+              top: 0,
+              opacity: 1,
+            }}
           >
-            <div className="bg-card p-4 rounded-lg shadow-sm">
+            <div className="bg-card p-4 rounded-lg border">
               <div className="flex justify-between items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
