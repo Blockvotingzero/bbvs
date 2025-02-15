@@ -11,12 +11,18 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { type Candidate } from "@shared/schema";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Check, Copy, Loader2 } from "lucide-react";
 
 export default function Vote() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [voteHash, setVoteHash] = useState<string>("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
@@ -24,33 +30,39 @@ export default function Vote() {
 
   const voteMutation = useMutation({
     mutationFn: async (data: { candidateId: number }) => {
+      // Simulate blockchain processing time
+      await new Promise(resolve => setTimeout(resolve, 1500));
       const res = await apiRequest("POST", "/api/vote", data);
       return res.json();
     },
-    onSuccess: () => {
-      toast({
-        title: "Vote Submitted",
-        description: "Your vote has been recorded on the blockchain."
-      });
-      setLocation("/");
+    onSuccess: (data) => {
+      // Generate a random Ethereum-style hash
+      const hash = "0x" + Array.from(crypto.getRandomValues(new Uint8Array(32)))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("")
+        .slice(0, 42);
+      setVoteHash(hash);
+      setIsSuccess(true);
+      setHasVoted(true);
     }
   });
 
   const onVoteSubmit = () => {
     if (!selectedCandidate || hasVoted) return;
-
-    const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
-
-    if (window.confirm(`Are you sure you want to vote for ${selectedCandidateName}? This action cannot be undone.`)) {
-      voteMutation.mutate({
-        candidateId: selectedCandidate
-      }, {
-        onSuccess: () => {
-          setHasVoted(true);
-        }
-      });
-    }
+    setShowConfirmDialog(true);
   };
+
+  const handleConfirm = () => {
+    voteMutation.mutate({ candidateId: selectedCandidate });
+  };
+
+  const handleCopyHash = async () => {
+    await navigator.clipboard.writeText(voteHash);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -100,10 +112,79 @@ export default function Vote() {
       >
         {voteMutation.isPending ? "Submitting Vote..." : "Submit Vote"}
       </Button>
+
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {!isSuccess ? "Confirm Your Vote" : "Vote Submitted Successfully!"}
+            </DialogTitle>
+            <DialogDescription>
+              {!voteMutation.isPending && !isSuccess && (
+                <>Are you sure you want to vote for {selectedCandidateName}? This action cannot be undone.</>
+              )}
+              {voteMutation.isPending && (
+                <div className="flex flex-col items-center justify-center py-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="mt-2">Processing your vote on the blockchain...</p>
+                </div>
+              )}
+              {isSuccess && (
+                <div className="space-y-4 mt-4">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="font-medium">Candidate: {selectedCandidateName}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <p className="font-mono text-sm truncate">{voteHash}</p>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleCopyHash}
+                        className="h-8 w-8"
+                      >
+                        {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Timestamp: {new Date().toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            {!voteMutation.isPending && !isSuccess && (
+              <>
+                <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleConfirm}>
+                  Continue
+                </Button>
+              </>
+            )}
+            {isSuccess && (
+              <Button onClick={() => setShowConfirmDialog(false)}>
+                Close
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {hasVoted && (
-        <p className="mt-4 text-center text-green-600 font-medium">
-          Your vote has been successfully cast. Thank you for participating!
-        </p>
+        <Card className="mt-8">
+          <CardContent className="pt-6">
+            <h3 className="font-semibold mb-4">Vote Confirmation</h3>
+            <div className="space-y-2">
+              <p>Candidate: {selectedCandidateName}</p>
+              <p className="font-mono text-sm">{voteHash}</p>
+              <p className="text-sm text-muted-foreground">
+                Voted on {new Date().toLocaleString()}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
