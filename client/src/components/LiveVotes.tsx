@@ -15,10 +15,7 @@ export default function LiveVotes() {
     let currentIndex = 0;
     const interval = setInterval(() => {
       const nextVote = votes[currentIndex];
-      setDisplayedVotes(prev => {
-        const updated = [nextVote, ...prev].slice(0, 5);
-        return updated;
-      });
+      setDisplayedVotes([nextVote]);
       currentIndex = (currentIndex + 1) % votes.length;
     }, 3000);
 
@@ -26,23 +23,30 @@ export default function LiveVotes() {
   }, [votes]);
 
   return (
-    <div className="h-[200px] overflow-hidden">
-      <h3 className="text-lg font-semibold mb-2">Live Votes</h3>
-      {displayedVotes.map((vote, i) => (
-        <div
-          key={`${vote.id}-${i}`}
-          className="bg-card p-3 rounded-lg mb-2 text-sm animate-slide-in"
-        >
-          <div className="flex justify-between items-center">
-            <span className="font-mono text-xs">
-              {vote.transactionHash.slice(0, 10)}...
-            </span>
-            <span className="text-muted-foreground text-xs">
-              {new Date(vote.timestamp).toLocaleTimeString()}
-            </span>
+    <div className="w-full">
+      <h3 className="text-lg font-semibold mb-4">Live Votes</h3>
+      <div className="relative h-24 overflow-hidden">
+        {displayedVotes.map((vote, i) => (
+          <div
+            key={`${vote.id}-${i}`}
+            className="absolute w-full transform transition-all duration-500 ease-in-out animate-slide-down"
+          >
+            <div className="bg-card p-4 rounded-lg shadow-sm">
+              <div className="flex justify-between items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="font-mono text-sm">
+                    {vote.transactionHash.slice(0, 10)}...
+                  </span>
+                </div>
+                <span className="text-muted-foreground text-sm">
+                  {new Date(vote.timestamp).toLocaleTimeString()}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
