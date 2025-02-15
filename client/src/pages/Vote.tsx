@@ -17,8 +17,10 @@ export default function Vote() {
   const { toast } = useToast();
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showHashDialog, setShowHashDialog] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
   const [voteHash, setVoteHash] = useState<string>("");
+  const [voteTimestamp, setVoteTimestamp] = useState<string>("");
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
@@ -35,12 +37,14 @@ export default function Vote() {
         Math.floor(Math.random() * 16).toString(16)
       ).join("");
       setVoteHash(hash);
+      setVoteTimestamp(new Date().toLocaleString());
+      setHasVoted(true);
+      setShowHashDialog(true);
 
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
       });
-      setHasVoted(true);
     }
   });
 
@@ -82,8 +86,46 @@ export default function Vote() {
         </div>
       </div>
 
+      {hasVoted && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              Your Vote Details
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Selected Candidate</p>
+              <p className="font-semibold">{candidates?.find(c => c.id === selectedCandidate)?.name}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Vote Cast On</p>
+              <p>{voteTimestamp}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Vote Hash</p>
+              <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                <code className="flex-1 text-sm font-mono break-all">{voteHash}</code>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2 shrink-0"
+                  onClick={handleCopyHash}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Visit the <a href="/explorer" className="text-primary hover:underline">Blockchain Explorer</a> to verify your vote using this hash.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       <h1 className="text-3xl font-bold mb-8">
-        {hasVoted ? "Your Vote" : "Select a Candidate"}
+        {hasVoted ? "Election Candidates" : "Select a Candidate"}
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -131,32 +173,7 @@ export default function Vote() {
         </Button>
       )}
 
-      {hasVoted && (
-        <div className="mt-8 p-6 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-4">
-            <CheckCircle2 className="h-5 w-5" />
-            <span className="font-medium">Vote Successfully Cast!</span>
-          </div>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Your vote has been recorded on the blockchain. You can verify your vote using the hash below:
-          </p>
-          <div className="flex items-center gap-2 p-3 bg-background rounded border">
-            <code className="flex-1 text-sm font-mono break-all">{voteHash}</code>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-2 shrink-0"
-              onClick={handleCopyHash}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Visit the <a href="/explorer" className="text-primary hover:underline">Blockchain Explorer</a> to verify your vote using this hash.
-          </p>
-        </div>
-      )}
-
+      {/* Vote Confirmation Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -180,6 +197,34 @@ export default function Vote() {
               ) : (
                 "Confirm Vote"
               )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Hash Display Dialog */}
+      <AlertDialog open={showHashDialog} onOpenChange={setShowHashDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Vote Successfully Cast!</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4">
+              <p>Your vote has been recorded on the blockchain. You can verify your vote using the hash below:</p>
+              <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                <code className="flex-1 text-sm font-mono break-all">{voteHash}</code>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2 shrink-0"
+                  onClick={handleCopyHash}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowHashDialog(false)}>
+              Close
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
