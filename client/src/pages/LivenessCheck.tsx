@@ -1,13 +1,20 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Video } from "lucide-react";
+import { Video, Camera, CheckCircle2 } from "lucide-react";
 
 export default function LivenessCheck() {
   const [, setLocation] = useLocation();
+  const [captured, setCaptured] = useState(false);
+
+  const handleCapture = useCallback(() => {
+    setCaptured(true);
+  }, []);
 
   const handleVerification = useCallback(() => {
+    // In a real implementation, we would verify the captured image
+    // For now, we'll just redirect to the voting page
     setLocation("/vote");
   }, [setLocation]);
 
@@ -21,16 +28,33 @@ export default function LivenessCheck() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-            <Video className="h-12 w-12 text-muted-foreground" />
+          <div className="aspect-video bg-muted rounded-lg flex items-center justify-center relative">
+            {captured ? (
+              <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                <CheckCircle2 className="h-12 w-12 text-primary" />
+              </div>
+            ) : (
+              <Video className="h-12 w-12 text-muted-foreground" />
+            )}
           </div>
 
-          <Button 
-            onClick={handleVerification}
-            className="w-full"
-          >
-            Start Verification
-          </Button>
+          <div className="flex gap-4">
+            <Button 
+              onClick={handleCapture}
+              className="flex-1 gap-2"
+              disabled={captured}
+            >
+              <Camera className="h-4 w-4" />
+              Capture
+            </Button>
+            <Button 
+              onClick={handleVerification}
+              className="flex-1"
+              disabled={!captured}
+            >
+              Verify
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -12,51 +12,18 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { type Candidate } from "@shared/schema";
 
-const verifySchema = z.object({
-  nin: z.string().min(10, "NIN must be at least 10 characters"),
-  phoneNumber: z.string().min(10, "Phone number must be at least 10 characters")
-});
-
 export default function Vote() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [step, setStep] = useState<"verify" | "otp" | "vote">("verify");
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
-  const [verificationData, setVerificationData] = useState<{
-    nin: string;
-    phoneNumber: string;
-    otp?: string;
-  } | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
   });
 
-  const form = useForm<z.infer<typeof verifySchema>>({
-    resolver: zodResolver(verifySchema),
-    defaultValues: {
-      nin: "",
-      phoneNumber: ""
-    }
-  });
-
-  const verifyMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof verifySchema>) => {
-      const res = await apiRequest("POST", "/api/verify", data);
-      return res.json();
-    },
-    onSuccess: (data, variables) => {
-      setVerificationData({ ...variables });
-      setStep("otp");
-      toast({
-        title: "OTP Sent",
-        description: "Please check your phone for the verification code."
-      });
-    }
-  });
-
   const voteMutation = useMutation({
-    mutationFn: async (data: { nin: string; phoneNumber: string; otp: string; candidateId: number }) => {
+    mutationFn: async (data: { candidateId: number }) => {
       const res = await apiRequest("POST", "/api/vote", data);
       return res.json();
     },
@@ -69,30 +36,13 @@ export default function Vote() {
     }
   });
 
-  const onVerifySubmit = (data: z.infer<typeof verifySchema>) => {
-    verifyMutation.mutate(data);
-  };
-
-  const onOtpSubmit = (otp: string) => {
-    if (!verificationData) return;
-    if (otp.length === 6 && /^\d+$/.test(otp)) {
-      setVerificationData({ ...verificationData, otp });
-      setStep("vote");
-    }
-  };
-
-  const [hasVoted, setHasVoted] = useState(false);
-
   const onVoteSubmit = () => {
-    if (!verificationData?.otp || !selectedCandidate || hasVoted) return;
-    
+    if (!selectedCandidate || hasVoted) return;
+
     const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
-    
+
     if (window.confirm(`Are you sure you want to vote for ${selectedCandidateName}? This action cannot be undone.`)) {
       voteMutation.mutate({
-        nin: verificationData.nin,
-        phoneNumber: verificationData.phoneNumber,
-        otp: verificationData.otp,
         candidateId: selectedCandidate
       }, {
         onSuccess: () => {
@@ -101,76 +51,6 @@ export default function Vote() {
       });
     }
   };
-
-  if (step === "verify") {
-    return (
-      <div className="max-w-md mx-auto px-4 sm:px-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Voter Verification</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onVerifySubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="nin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>National Identification Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={verifyMutation.isPending}>
-                  {verifyMutation.isPending ? "Verifying..." : "Verify"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (step === "otp") {
-    return (
-      <div className="max-w-md mx-auto px-4 sm:px-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Enter OTP</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Input
-              type="text"
-              placeholder="Enter OTP"
-              className="mb-4"
-              onChange={(e) => onOtpSubmit(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              Enter the verification code sent to your phone
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -183,7 +63,7 @@ export default function Vote() {
           </div>
           <div>
             <h2 className="text-2xl font-semibold">Abubakar</h2>
-            <p className="text-muted-foreground">NIN: {verificationData?.nin}</p>
+            <p className="text-muted-foreground">Date of Birth: 4th November 2000</p>
           </div>
         </div>
       </div>
