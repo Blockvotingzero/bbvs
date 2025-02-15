@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import OTPVerification from "./pages/OTPVerification";
 import LivenessCheck from "./pages/LivenessCheck";
+import Vote from "./pages/Vote";
 import Explorer from "./pages/Explorer";
 import NotFound from "./pages/not-found";
 
@@ -18,6 +19,7 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/otp" component={OTPVerification} />
         <Route path="/liveness" component={LivenessCheck} />
+        <Route path="/vote" component={Vote} />
         <Route path="/explorer" component={Explorer} />
         <Route component={NotFound} />
       </Switch>
