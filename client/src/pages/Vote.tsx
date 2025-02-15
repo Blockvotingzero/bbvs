@@ -20,6 +20,7 @@ export default function Vote() {
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [voteHash, setVoteHash] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
 
@@ -42,11 +43,12 @@ export default function Vote() {
         .slice(0, 42);
       setVoteHash(hash);
       setHasVoted(true);
+      setShowConfirmDialog(false);
+      setShowSuccessDialog(true);
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
       });
-      setShowConfirmDialog(false);
     }
   });
 
@@ -84,6 +86,7 @@ export default function Vote() {
           </div>
         </div>
       </div>
+
       <h1 className="text-3xl font-bold mb-8">Select a Candidate</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {candidates?.map((candidate) => (
@@ -118,6 +121,7 @@ export default function Vote() {
         {voteMutation.isPending ? "Submitting Vote..." : hasVoted ? "Vote Submitted" : "Submit Vote"}
       </Button>
 
+      {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
@@ -146,6 +150,43 @@ export default function Vote() {
                 </Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Vote Submitted Successfully!
+            </DialogTitle>
+            <DialogDescription>
+              <div className="space-y-4 mt-4">
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="font-medium">Candidate: {selectedCandidateName}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <p className="font-mono text-sm truncate">{voteHash}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleCopyHash}
+                      className="h-8 w-8"
+                    >
+                      {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Timestamp: {new Date().toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setShowSuccessDialog(false)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
