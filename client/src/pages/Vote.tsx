@@ -82,15 +82,20 @@ export default function Vote() {
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-8">Select a Candidate</h1>
+      <h1 className="text-3xl font-bold mb-8">
+        {hasVoted ? "Your Vote" : "Select a Candidate"}
+      </h1>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {candidates?.map((candidate) => (
           <Card
             key={candidate.id}
-            className={`cursor-pointer transition-colors ${
-              selectedCandidate === candidate.id ? "border-primary" : ""
-            }`}
-            onClick={() => setSelectedCandidate(candidate.id)}
+            className={`transition-colors ${
+              selectedCandidate === candidate.id 
+                ? "border-primary bg-primary/5" 
+                : ""
+            } ${!hasVoted ? "cursor-pointer hover:border-primary/50" : ""}`}
+            onClick={() => !hasVoted && setSelectedCandidate(candidate.id)}
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -109,36 +114,38 @@ export default function Vote() {
         ))}
       </div>
 
-      <Button
-        className="mt-8 w-full"
-        disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
-        onClick={onVoteSubmit}
-      >
-        {voteMutation.isPending ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Submitting Vote...
-          </>
-        ) : (
-          "Submit Vote"
-        )}
-      </Button>
+      {!hasVoted && (
+        <Button
+          className="mt-8 w-full"
+          disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
+          onClick={onVoteSubmit}
+        >
+          {voteMutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting Vote...
+            </>
+          ) : (
+            "Submit Vote"
+          )}
+        </Button>
+      )}
 
       {hasVoted && (
-        <div className="mt-6 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+        <div className="mt-8 p-6 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-4">
             <CheckCircle2 className="h-5 w-5" />
             <span className="font-medium">Vote Successfully Cast!</span>
           </div>
           <p className="mb-4 text-sm text-muted-foreground">
             Your vote has been recorded on the blockchain. You can verify your vote using the hash below:
           </p>
-          <div className="flex items-center gap-2 p-2 bg-background rounded border">
-            <code className="flex-1 text-sm font-mono">{voteHash}</code>
+          <div className="flex items-center gap-2 p-3 bg-background rounded border">
+            <code className="flex-1 text-sm font-mono break-all">{voteHash}</code>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-8 px-2"
+              className="h-8 px-2 shrink-0"
               onClick={handleCopyHash}
             >
               <Copy className="h-4 w-4" />
