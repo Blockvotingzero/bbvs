@@ -32,8 +32,8 @@ export default function LiveVotes() {
       setDisplayedVotes([nextVote]);
       currentIndex = (currentIndex + 1) % votes.length;
 
-      // Schedule next vote with random delay between 0.5s and 1.5s
-      const nextDelay = 500 + Math.random() * 1000;
+      // Schedule next vote with random delay between 1s and 3s
+      const nextDelay = 1000 + Math.random() * 2000;
       setTimeout(showNextVote, nextDelay);
     };
 
