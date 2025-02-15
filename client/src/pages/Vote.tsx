@@ -30,9 +30,15 @@ export default function Vote() {
 
   const voteMutation = useMutation({
     mutationFn: async (data: { candidateId: number }) => {
+      const voteData = {
+        nin: "1234567890", // This should come from auth context
+        phoneNumber: "1234567890", // This should come from auth context
+        candidateId: data.candidateId,
+        otp: "123456" // This should come from OTP verification
+      };
       // Simulate blockchain processing time
       await new Promise(resolve => setTimeout(resolve, 1500));
-      const res = await apiRequest("POST", "/api/vote", data);
+      const res = await apiRequest("POST", "/api/vote", voteData);
       if (!res.ok) {
         throw new Error("Failed to submit vote");
       }
