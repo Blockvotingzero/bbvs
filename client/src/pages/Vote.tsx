@@ -21,7 +21,6 @@ export default function Vote() {
   const [hasVoted, setHasVoted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [voteHash, setVoteHash] = useState<string>("");
-  const [isSuccess, setIsSuccess] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
   const { data: candidates } = useQuery<Candidate[]>({
@@ -42,8 +41,12 @@ export default function Vote() {
         .join("")
         .slice(0, 42);
       setVoteHash(hash);
-      setIsSuccess(true);
       setHasVoted(true);
+      toast({
+        title: "Vote Submitted",
+        description: "Your vote has been recorded on the blockchain."
+      });
+      setShowConfirmDialog(false);
     }
   });
 
@@ -53,7 +56,9 @@ export default function Vote() {
   };
 
   const handleConfirm = () => {
-    voteMutation.mutate({ candidateId: selectedCandidate });
+    if (selectedCandidate) {
+      voteMutation.mutate({ candidateId: selectedCandidate });
+    }
   };
 
   const handleCopyHash = async () => {
@@ -86,8 +91,8 @@ export default function Vote() {
             key={candidate.id}
             className={`cursor-pointer transition-colors ${
               selectedCandidate === candidate.id ? "border-primary" : ""
-            }`}
-            onClick={() => setSelectedCandidate(candidate.id)}
+            } ${hasVoted ? "opacity-50 cursor-not-allowed" : ""}`}
+            onClick={() => !hasVoted && setSelectedCandidate(candidate.id)}
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -110,50 +115,28 @@ export default function Vote() {
         disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
         onClick={onVoteSubmit}
       >
-        {voteMutation.isPending ? "Submitting Vote..." : "Submit Vote"}
+        {voteMutation.isPending ? "Submitting Vote..." : hasVoted ? "Vote Submitted" : "Submit Vote"}
       </Button>
 
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {!isSuccess ? "Confirm Your Vote" : "Vote Submitted Successfully!"}
+              Confirm Your Vote
             </DialogTitle>
             <DialogDescription>
-              {!voteMutation.isPending && !isSuccess && (
-                <>Are you sure you want to vote for {selectedCandidateName}? This action cannot be undone.</>
-              )}
-              {voteMutation.isPending && (
+              {!voteMutation.isPending ? (
+                <p>Are you sure you want to vote for {selectedCandidateName}? This action cannot be undone.</p>
+              ) : (
                 <div className="flex flex-col items-center justify-center py-4">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   <p className="mt-2">Processing your vote on the blockchain...</p>
                 </div>
               )}
-              {isSuccess && (
-                <div className="space-y-4 mt-4">
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="font-medium">Candidate: {selectedCandidateName}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <p className="font-mono text-sm truncate">{voteHash}</p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleCopyHash}
-                        className="h-8 w-8"
-                      >
-                        {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Timestamp: {new Date().toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            {!voteMutation.isPending && !isSuccess && (
+            {!voteMutation.isPending && (
               <>
                 <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
                   Cancel
@@ -163,11 +146,6 @@ export default function Vote() {
                 </Button>
               </>
             )}
-            {isSuccess && (
-              <Button onClick={() => setShowConfirmDialog(false)}>
-                Close
-              </Button>
-            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -175,13 +153,25 @@ export default function Vote() {
       {hasVoted && (
         <Card className="mt-8">
           <CardContent className="pt-6">
-            <h3 className="font-semibold mb-4">Vote Confirmation</h3>
-            <div className="space-y-2">
-              <p>Candidate: {selectedCandidateName}</p>
-              <p className="font-mono text-sm">{voteHash}</p>
-              <p className="text-sm text-muted-foreground">
-                Voted on {new Date().toLocaleString()}
-              </p>
+            <h3 className="text-xl font-semibold mb-4">Vote Confirmation</h3>
+            <div className="space-y-4">
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="font-medium">Candidate: {selectedCandidateName}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="font-mono text-sm truncate">{voteHash}</p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleCopyHash}
+                    className="h-8 w-8"
+                  >
+                    {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Voted on {new Date().toLocaleString()}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
