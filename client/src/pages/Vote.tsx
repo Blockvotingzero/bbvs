@@ -189,23 +189,46 @@ export default function Vote() {
               Vote Submitted Successfully!
             </DialogTitle>
             <DialogDescription asChild>
-              <div className="space-y-4 mt-4">
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="font-medium">Candidate: {selectedCandidateName}</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <code className="font-mono text-sm truncate">{voteHash}</code>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleCopyHash}
-                      className="h-8 w-8"
-                    >
-                      {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </Button>
+              <div className="space-y-6 mt-4">
+                <div className="p-6 bg-muted rounded-lg">
+                  <div className="space-y-4">
+                    <div>
+                      <div className="text-sm text-muted-foreground">You voted for</div>
+                      <div className="text-xl font-semibold">{selectedCandidateName}</div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm text-muted-foreground mb-2">Your vote hash (click to copy)</div>
+                      <div 
+                        className="flex items-center justify-between p-3 bg-background rounded border cursor-pointer hover:bg-accent transition-colors"
+                        onClick={handleCopyHash}
+                      >
+                        <code className="font-mono text-sm">{voteHash}</code>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          {isCopied ? (
+                            <>
+                              <Check className="h-4 w-4 text-green-500" />
+                              <span className="text-sm">Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-4 w-4" />
+                              <span className="text-sm">Copy hash</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <div className="text-sm text-muted-foreground">Timestamp</div>
+                      <div>{new Date().toLocaleString()}</div>
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-2">
-                    Timestamp: {new Date().toLocaleString()}
-                  </div>
+                </div>
+                
+                <div className="text-sm text-muted-foreground text-center">
+                  Please save this hash to track your vote on the blockchain
                 </div>
               </div>
             </DialogDescription>
