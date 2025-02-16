@@ -102,6 +102,7 @@ export default function Vote() {
           <div>
             <h2 className="text-2xl font-semibold">Abubakar</h2>
             <p className="text-muted-foreground">Date of Birth: 4th November 2000</p>
+            <p className="text-muted-foreground mt-1">NIN: {sessionStorage.getItem('userNIN')}</p>
           </div>
         </div>
       </div>
