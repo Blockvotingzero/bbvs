@@ -91,9 +91,9 @@ export default function Vote() {
   const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8 p-6 bg-card rounded-lg border shadow">
-        <div className="flex items-center gap-4">
+    <div className="max-w-4xl mx-auto px-4">
+      <div className="mb-8 p-4 sm:p-6 bg-card rounded-lg border shadow">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
             <svg className="w-12 h-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -107,17 +107,17 @@ export default function Vote() {
       </div>
 
       {hasVoted && (
-        <div className="mb-8 p-6 bg-card rounded-lg border shadow-sm">
+        <div className="mb-8 p-4 sm:p-6 bg-card rounded-lg border shadow-sm">
           <h3 className="text-lg font-semibold mb-4">Your Vote Details</h3>
           <div className="space-y-3">
-            <div className="flex justify-between py-2 border-b">
+            <div className="flex flex-col sm:flex-row justify-between py-2 border-b">
               <span className="text-muted-foreground">Candidate</span>
               <span className="font-medium">{votedCandidateName}</span>
             </div>
-            <div className="flex justify-between py-2 border-b">
+            <div className="flex flex-col sm:flex-row justify-between py-2 border-b">
               <span className="text-muted-foreground">Transaction Hash</span>
-              <div className="flex items-center gap-2">
-                <code className="font-mono text-sm">{voteHash.slice(0, 16)}...</code>
+              <div className="flex items-center gap-2 overflow-hidden">
+                <code className="font-mono text-sm overflow-hidden text-ellipsis">{voteHash.slice(0, 16)}...</code>
                 <Button
                   variant="ghost"
                   size="icon"
