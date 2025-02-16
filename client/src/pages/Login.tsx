@@ -34,7 +34,7 @@ export default function Login() {
 
   const onSubmit = useCallback((data: FormData) => {
     // Store NIN in sessionStorage
-    sessionStorage.setItem('userNIN', data.nin);
+    localStorage.setItem('userNIN', data.nin);
     
     if (data.phone) {
       setLocation("/otp");

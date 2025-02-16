@@ -16,6 +16,14 @@ import { Check, Copy, Loader2 } from "lucide-react";
 
 export default function Vote() {
   const [, setLocation] = useLocation();
+
+  // Check if user is authenticated
+  React.useEffect(() => {
+    const nin = localStorage.getItem('userNIN');
+    if (!nin) {
+      setLocation('/login');
+    }
+  }, [setLocation]);
   const { toast } = useToast();
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -102,7 +110,7 @@ export default function Vote() {
           <div>
             <h2 className="text-2xl font-semibold">Abubakar</h2>
             <p className="text-muted-foreground">Date of Birth: 4th November 2000</p>
-            <p className="text-muted-foreground mt-1">NIN: {sessionStorage.getItem('userNIN')}</p>
+            <p className="text-muted-foreground mt-1">NIN: {localStorage.getItem('userNIN')}</p>
           </div>
         </div>
       </div>
