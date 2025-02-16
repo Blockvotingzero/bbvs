@@ -221,22 +221,22 @@ export default function Vote() {
               Vote Submitted Successfully!
             </DialogTitle>
             <DialogDescription asChild>
-              <div className="space-y-6 mt-4">
-                <div className="p-6 bg-muted rounded-lg">
+              <div className="space-y-4 mt-4 px-2 sm:px-4">
+                <div className="p-4 sm:p-6 bg-muted rounded-lg">
                   <div className="space-y-4">
                     <div>
                       <div className="text-sm text-muted-foreground">You voted for</div>
-                      <div className="text-xl font-semibold">{votedCandidateName}</div>
+                      <div className="text-lg sm:text-xl font-semibold">{votedCandidateName}</div>
                     </div>
                     
                     <div>
                       <div className="text-sm text-muted-foreground mb-2">Your vote hash (click to copy)</div>
                       <div 
-                        className="flex items-center justify-between p-3 bg-background rounded border cursor-pointer hover:bg-accent transition-colors"
+                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-background rounded border cursor-pointer hover:bg-accent transition-colors gap-2"
                         onClick={handleCopyHash}
                       >
-                        <code className="font-mono text-sm">{voteHash}</code>
-                        <div className="flex items-center gap-2 text-muted-foreground">
+                        <code className="font-mono text-xs sm:text-sm break-all">{voteHash}</code>
+                        <div className="flex items-center gap-2 text-muted-foreground shrink-0">
                           {isCopied ? (
                             <>
                               <Check className="h-4 w-4 text-green-500" />
@@ -254,7 +254,7 @@ export default function Vote() {
 
                     <div className="pt-2">
                       <div className="text-sm text-muted-foreground">Timestamp</div>
-                      <div>{new Date().toLocaleString()}</div>
+                      <div className="text-sm sm:text-base">{new Date().toLocaleString()}</div>
                     </div>
                   </div>
                 </div>
