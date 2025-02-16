@@ -188,12 +188,12 @@ export default function Vote() {
             <DialogTitle>
               Vote Submitted Successfully!
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription asChild>
               <div className="space-y-4 mt-4">
                 <div className="p-4 bg-muted rounded-lg">
-                  <p className="font-medium">Candidate: {selectedCandidateName}</p>
+                  <div className="font-medium">Candidate: {selectedCandidateName}</div>
                   <div className="flex items-center gap-2 mt-2">
-                    <p className="font-mono text-sm truncate">{voteHash}</p>
+                    <code className="font-mono text-sm truncate">{voteHash}</code>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -203,9 +203,9 @@ export default function Vote() {
                       {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <div className="text-sm text-muted-foreground mt-2">
                     Timestamp: {new Date().toLocaleString()}
-                  </p>
+                  </div>
                 </div>
               </div>
             </DialogDescription>
@@ -217,33 +217,6 @@ export default function Vote() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {hasVoted && voteHash && (
-        <Card className="mt-8 border-primary">
-          <CardContent className="pt-6">
-            <h3 className="text-xl font-semibold mb-4">Vote Confirmation</h3>
-            <div className="space-y-4">
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="font-medium">Candidate: {selectedCandidateName}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="font-mono text-sm truncate">{voteHash}</p>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleCopyHash}
-                    className="h-8 w-8"
-                  >
-                    {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Voted on {new Date().toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
