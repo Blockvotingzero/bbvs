@@ -43,8 +43,8 @@ export default function Login() {
   const phoneValue = form.watch("phone");
 
   return (
-    <div className="container max-w-lg mx-auto">
-      <Card>
+    <div className="container max-w-lg mx-auto px-4 py-8">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Voter Authentication</CardTitle>
           <CardDescription>
@@ -90,10 +90,10 @@ export default function Login() {
                 )}
               />
 
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   type="submit"
-                  className="flex-1 gap-2"
+                  className="w-full gap-2"
                   disabled={!phoneValue}
                 >
                   <Phone className="h-4 w-4" />
@@ -101,7 +101,7 @@ export default function Login() {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 gap-2"
+                  className="w-full gap-2"
                   disabled={!!phoneValue}
                 >
                   <Fingerprint className="h-4 w-4" />
