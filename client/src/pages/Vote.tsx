@@ -203,15 +203,17 @@ export default function Vote() {
             <DialogTitle>
               Confirm Your Vote
             </DialogTitle>
-            <DialogDescription>
-              {!voteMutation.isPending ? (
-                <p>Are you sure you want to vote for {selectedCandidateName}? This action cannot be undone.</p>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-4">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="mt-2">Processing your vote on the blockchain...</p>
-                </div>
-              )}
+            <DialogDescription asChild>
+              <div>
+                {!voteMutation.isPending ? (
+                  <div>Are you sure you want to vote for {selectedCandidateName}? This action cannot be undone.</div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <div className="mt-2">Processing your vote on the blockchain...</div>
+                  </div>
+                )}
+              </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -236,12 +238,12 @@ export default function Vote() {
             <DialogTitle>
               Vote Submitted Successfully!
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription asChild>
               <div className="space-y-4 mt-4">
                 <div className="p-4 bg-muted rounded-lg">
-                  <p className="font-medium">Candidate: {selectedCandidateName}</p>
+                  <div className="font-medium">Candidate: {selectedCandidateName}</div>
                   <div className="flex items-center gap-2 mt-2">
-                    <p className="font-mono text-sm truncate">{voteHash}</p>
+                    <code className="font-mono text-sm truncate">{voteHash}</code>
                     <Button
                       variant="ghost"
                       size="icon"
