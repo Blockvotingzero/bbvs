@@ -23,6 +23,7 @@ export default function Vote() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [voteHash, setVoteHash] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
+  const [votedCandidateName, setVotedCandidateName] = useState<string>("");
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
@@ -53,6 +54,7 @@ export default function Vote() {
       setHasVoted(true);
       setShowConfirmDialog(false);
       setShowSuccessDialog(true);
+      setVotedCandidateName(selectedCandidateName || "");
       setSelectedCandidate(null); // Reset selection
       toast({
         title: "Vote Submitted",
@@ -110,7 +112,7 @@ export default function Vote() {
           <div className="space-y-3">
             <div className="flex justify-between py-2 border-b">
               <span className="text-muted-foreground">Candidate</span>
-              <span className="font-medium">{selectedCandidateName}</span>
+              <span className="font-medium">{votedCandidateName}</span>
             </div>
             <div className="flex justify-between py-2 border-b">
               <span className="text-muted-foreground">Transaction Hash</span>
@@ -224,7 +226,7 @@ export default function Vote() {
                   <div className="space-y-4">
                     <div>
                       <div className="text-sm text-muted-foreground">You voted for</div>
-                      <div className="text-xl font-semibold">{selectedCandidateName}</div>
+                      <div className="text-xl font-semibold">{votedCandidateName}</div>
                     </div>
                     
                     <div>
