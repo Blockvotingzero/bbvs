@@ -36,6 +36,8 @@ export default function Login() {
     // Store NIN in sessionStorage
     localStorage.setItem('userNIN', data.nin);
     
+    const intendedPath = localStorage.getItem('intendedPath') || '/vote';
+    localStorage.removeItem('intendedPath');
     if (data.phone) {
       setLocation("/otp");
     } else {

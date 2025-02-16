@@ -22,7 +22,12 @@ function Router() {
         <Route path="/vote">
           {() => {
             const nin = localStorage.getItem('userNIN');
-            return nin ? <Vote /> : (window.location.href = '/login');
+            if (!nin) {
+              localStorage.setItem('intendedPath', '/vote');
+              setLocation('/login');
+              return null;
+            }
+            return <Vote />;
           }}
         </Route>
         <Route path="/explorer" component={Explorer} />
