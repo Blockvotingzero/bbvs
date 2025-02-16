@@ -104,6 +104,36 @@ export default function Vote() {
         </div>
       </div>
 
+      {hasVoted && (
+        <div className="mb-8 p-6 bg-card rounded-lg border shadow-sm">
+          <h3 className="text-lg font-semibold mb-4">Your Vote Details</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between py-2 border-b">
+              <span className="text-muted-foreground">Candidate</span>
+              <span className="font-medium">{selectedCandidateName}</span>
+            </div>
+            <div className="flex justify-between py-2 border-b">
+              <span className="text-muted-foreground">Transaction Hash</span>
+              <div className="flex items-center gap-2">
+                <code className="font-mono text-sm">{voteHash.slice(0, 16)}...</code>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyHash}
+                  className="h-6 w-6"
+                >
+                  {isCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-between py-2 border-b">
+              <span className="text-muted-foreground">Timestamp</span>
+              <span>{new Date().toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <h1 className="text-3xl font-bold mb-8">Select a Candidate</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {candidates?.map((candidate) => (
