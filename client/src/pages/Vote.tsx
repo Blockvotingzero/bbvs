@@ -13,6 +13,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { type Candidate } from "@shared/schema";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Check, Copy, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Vote() {
   const [, setLocation] = useLocation();
@@ -87,8 +89,54 @@ export default function Vote() {
   };
 
   const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
+  const votedCandidate = hasVoted ? candidates?.find(c => c.id === selectedCandidate) : null;
 
   return (
+    <>
+      {/* Voter Status Card */}
+      <Card className="mb-8">
+        <CardContent className="pt-6">
+          {hasVoted ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <h3 className="text-xl font-semibold">Vote Cast Successfully</h3>
+              </div>
+              <div className="space-y-2">
+                <p className="text-muted-foreground">You voted for:</p>
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="font-medium">{votedCandidate?.name}</p>
+                  <p className="text-sm text-muted-foreground">{votedCandidate?.party}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="font-mono text-sm">{voteHash}</p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleCopyHash}
+                    className="h-8 w-8"
+                  >
+                    {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Voted on {new Date().toLocaleString()}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <h3 className="text-xl font-semibold">Cast Your Vote</h3>
+              </div>
+              <p className="text-muted-foreground">
+                Select a candidate from the list below and click "Submit Vote" to cast your vote.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 p-6 bg-card rounded-lg border shadow">
         <div className="flex items-center gap-4">
