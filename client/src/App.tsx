@@ -19,7 +19,12 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/otp" component={OTPVerification} />
         <Route path="/liveness" component={LivenessCheck} />
-        <Route path="/vote" component={Vote} />
+        <Route path="/vote">
+          {() => {
+            const nin = localStorage.getItem('userNIN');
+            return nin ? <Vote /> : (window.location.href = '/login');
+          }}
+        </Route>
         <Route path="/explorer" component={Explorer} />
         <Route component={NotFound} />
       </Switch>
