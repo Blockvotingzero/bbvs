@@ -26,12 +26,12 @@ export default function Vote() {
   }, [setLocation]);
   const { toast } = useToast();
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
-  const [hasVoted, setHasVoted] = useState(() => localStorage.getItem('hasVoted') === 'true');
+  const [hasVoted, setHasVoted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [voteHash, setVoteHash] = useState<string>(localStorage.getItem('voteHash') || "");
+  const [voteHash, setVoteHash] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
-  const [votedCandidateName, setVotedCandidateName] = useState<string>(localStorage.getItem('votedCandidateName') || "");
+  const [votedCandidateName, setVotedCandidateName] = useState<string>("");
 
   const { data: candidates } = useQuery<Candidate[]>({
     queryKey: ["/api/candidates"]
@@ -63,11 +63,6 @@ export default function Vote() {
       setShowConfirmDialog(false);
       setShowSuccessDialog(true);
       setVotedCandidateName(selectedCandidateName || "");
-      
-      // Persist vote information
-      localStorage.setItem('hasVoted', 'true');
-      localStorage.setItem('voteHash', hash);
-      localStorage.setItem('votedCandidateName', selectedCandidateName || "");
       setSelectedCandidate(null); // Reset selection
       toast({
         title: "Vote Submitted",
