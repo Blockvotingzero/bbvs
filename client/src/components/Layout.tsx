@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </a>
             </Link>
 
-            <Link href="/vote">
+            <Link href="/login">
               <Button variant="default" className="gap-2">
                 <Vote className="h-4 w-4" />
                 Vote
