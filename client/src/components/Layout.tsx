@@ -1,69 +1,35 @@
-import { Link, useLocation } from "wouter";
-import { Moon, Sun, Vote } from "lucide-react";
-import { Button } from "./ui/button";
-import { useTheme } from "@/hooks/use-theme";
+import React from "react";
+import { useLocation } from "wouter";
+import { useTheme } from "../hooks/use-theme";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/">
-            <a className="text-2xl font-bold text-primary">
-              BlockVote
-            </a>
-          </Link>
-
-          <div className="flex items-center gap-6">
-            <Link href="/">
-              <a className={`${location === "/" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors flex items-center gap-2`}>
-                Statistics
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-              </a>
-            </Link>
-
-            <Link href="/explorer">
-              <a className={`${location === "/explorer" ? "text-primary" : "text-muted-foreground"} hover:text-primary transition-colors`}>
-                Explorer
-              </a>
-            </Link>
-
-            <Link href="/login">
-              <Button variant="default" className="gap-2">
-                <Vote className="h-4 w-4" />
-                Vote
-              </Button>
-            </Link>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+    <ErrorBoundary>
+      <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+        <header className="bg-primary text-white p-4 shadow-md">
+          <div className="container mx-auto flex justify-between items-center">
+            <h1 className="text-xl font-bold">Blockchain Voting System</h1>
+            <nav className="flex space-x-4">
+              <a href="/" className={location === '/' ? 'font-bold' : ''}>Home</a>
+              <a href="/explorer" className={location === '/explorer' ? 'font-bold' : ''}>Explorer</a>
+              <a href="/vote" className={location === '/vote' ? 'font-bold' : ''}>Vote</a>
+              <button onClick={toggleTheme} className="ml-4">
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+            </nav>
           </div>
-        </nav>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {children}
-      </main>
-
-      <footer className="border-t mt-auto">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between text-sm text-muted-foreground">
-          <p>© 2024 BlockVote. All rights reserved.</p>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-primary">Privacy Policy</a>
-            <a href="#" className="hover:text-primary">Terms of Service</a>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </header>
+        <main className="container mx-auto p-4">
+          {children}
+        </main>
+        <footer className="bg-gray-100 p-4 text-center dark:bg-gray-800 dark:text-white">
+          <p>© 2023 Blockchain Voting System</p>
+        </footer>
+      </div>
+    </ErrorBoundary>
   );
 }
