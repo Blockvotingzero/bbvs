@@ -1,37 +1,53 @@
 import { Candidate, Vote } from "@/types/schema";
 
+// Mock candidates data with placeholder avatars using data URLs
 export const mockCandidates: Candidate[] = [
   {
     id: 1,
     name: "Bola Ahmed Tinubu",
     party: "APC",
-    avatar: "https://example.com/tinubu.jpg",
   },
   {
     id: 2,
-    name: "Atiku Abubakar",
-    party: "PDP",
-    avatar: "https://example.com/atiku.jpg",
+    name: "Peter Obi",
+    party: "LP",
   },
   {
     id: 3,
-    name: "Peter Obi",
-    party: "LP",
-    avatar: "https://example.com/obi.jpg",
+    name: "Atiku Abubakar",
+    party: "PDP",
   },
 ];
 
-export const generateMockVotes = (count: number = 50): Vote[] => {
-  return Array.from({ length: count }, (_, index) => ({
-    id: index + 1,
-    candidateId: mockCandidates[Math.floor(Math.random() * mockCandidates.length)].id,
-    voterHash: `0x${Math.random().toString(16).slice(2)}`,
-    timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-    blockHeight: Math.floor(Math.random() * 1000000) + 1,
-    transactionHash: `0x${Math.random().toString(16).slice(2)}`,
-  }));
+// Generate random transaction hash
+const generateTransactionHash = () => {
+  return '0x' + Array(64).fill(0).map(() => 
+    Math.floor(Math.random() * 16).toString(16)).join('');
 };
 
+// Generate mock votes
+export const generateMockVotes = (count: number = 200): Vote[] => {
+  const votes: Vote[] = [];
+  const now = new Date();
+
+  for (let i = 0; i < count; i++) {
+    const randomCandidateId = Math.floor(Math.random() * 3) + 1;
+    const randomTime = new Date(now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000);
+
+    votes.push({
+      id: i + 1,
+      candidateId: randomCandidateId,
+      voterHash: generateTransactionHash(),
+      timestamp: randomTime.toISOString(),
+      blockHeight: 14000000 + i,
+      transactionHash: generateTransactionHash()
+    });
+  }
+
+  return votes.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+};
+
+// Generate and export votes
 export const mockVotes = generateMockVotes();
 
 // Helper functions
@@ -47,9 +63,10 @@ export const getTotalVotes = (): number => {
   return mockVotes.length;
 };
 
-export const getVoteDistribution = (): Record<number, number> => {
-  return mockVotes.reduce((acc, vote) => {
-    acc[vote.candidateId] = (acc[vote.candidateId] || 0) + 1;
-    return acc;
-  }, {} as Record<number, number>);
+export const getVoteDistribution = (): Record<string, number> => {
+  const distribution: Record<string, number> = {};
+  mockCandidates.forEach(candidate => {
+    distribution[candidate.party] = getVotesByCandidate(candidate.id).length;
+  });
+  return distribution;
 };

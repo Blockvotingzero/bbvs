@@ -1,20 +1,19 @@
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { type Vote } from "@/types/schema";
-import { mockVotes } from "@/lib/mockData";
+import { mockCandidates, mockVotes, getVotesByCandidate } from "@/lib/mockData";
 
 export default function NigeriaMap() {
-  const [selectedState, setSelectedState] = useState('');
+  const [selectedState, setSelectedState] = useState<string>('');
 
   const getVoteStats = (state: string | null) => {
     // For now, we'll return mock statistics since we don't have state-specific data
     const votes = mockVotes;
-    const stateVotes = state === "all" || !state ? votes : votes.filter(v => (v as any).state === state);
     return {
-      total: stateVotes.length,
-      tinubu: stateVotes.filter(v => v.candidateId === 1).length,
-      obi: stateVotes.filter(v => v.candidateId === 2).length,
-      atiku: stateVotes.filter(v => v.candidateId === 3).length,
+      total: votes.length,
+      tinubu: getVotesByCandidate(1).length,
+      obi: getVotesByCandidate(2).length,
+      atiku: getVotesByCandidate(3).length,
     };
   };
 
@@ -30,7 +29,6 @@ export default function NigeriaMap() {
             <SelectItem value="Lagos">Lagos</SelectItem>
             <SelectItem value="Abuja">Abuja</SelectItem>
             <SelectItem value="Kano">Kano</SelectItem>
-            {/* Add more states as needed */}
           </SelectContent>
         </Select>
         <div className="bg-muted p-4 rounded-lg">
