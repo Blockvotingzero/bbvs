@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { mockVotes, mockCandidates } from "@/lib/mockData";
 import type { Vote } from "@/types/schema";
+import LiveVotes from "@/components/LiveVotes";
 
 export default function Explorer() {
   const [search, setSearch] = useState("");
@@ -77,6 +78,8 @@ export default function Explorer() {
           </CardContent>
         </Card>
       </div>
+
+      <LiveVotes />
 
       <div className="flex justify-between items-center mb-4">
         <Input
