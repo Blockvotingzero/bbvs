@@ -1,8 +1,8 @@
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
 import { 
   Table, 
   TableBody, 
@@ -101,6 +101,30 @@ export default function Explorer() {
         </Card>
       </div>
 
+      {/* Candidate-specific statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {candidates.map((candidate, index) => (
+          <Card key={candidate.id}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">{candidate.name} ({candidate.party})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{candidate.votes.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Votes received</p>
+              <div className="mt-2 bg-muted h-2 rounded-full overflow-hidden">
+                <div 
+                  className="h-full rounded-full" 
+                  style={{ 
+                    width: `${(candidate.votes / candidates.reduce((sum, c) => sum + c.votes, 0)) * 100}%`,
+                    backgroundColor: ['#FF8042', '#00C49F', '#0088FE'][index] 
+                  }}
+                ></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Transaction History</CardTitle>
@@ -128,24 +152,29 @@ export default function Explorer() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedVotes.map((vote) => (
-                  <TableRow key={vote.id}>
-                    <TableCell className="font-mono">{vote.transactionHash}</TableCell>
-                    <TableCell>#{vote.blockNumber.toLocaleString()}</TableCell>
-                    <TableCell>{formatDate(vote.timestamp)}</TableCell>
-                    <TableCell className="font-mono">{vote.voterAddress.slice(0, 10)}...</TableCell>
-                    <TableCell>
-                      {getCandidateName(vote.candidateId)} ({getCandidateParty(vote.candidateId)})
-                    </TableCell>
-                  </TableRow>
-                ))}
-
-                {paginatedVotes.length === 0 && (
+                {paginatedVotes.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                      No transactions found.
+                    <TableCell colSpan={5} className="text-center py-4">
+                      No transactions found
                     </TableCell>
                   </TableRow>
+                ) : (
+                  paginatedVotes.map((vote) => (
+                    <TableRow key={vote.transactionHash}>
+                      <TableCell className="font-mono text-xs">
+                        {vote.transactionHash.substring(0, 10)}...{vote.transactionHash.substring(vote.transactionHash.length - 10)}
+                      </TableCell>
+                      <TableCell>#{vote.blockNumber}</TableCell>
+                      <TableCell>{formatDate(vote.timestamp)}</TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {vote.voterAddress.substring(0, 6)}...{vote.voterAddress.substring(vote.voterAddress.length - 4)}
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-medium">{getCandidateName(vote.candidateId)}</span>
+                        <span className="text-xs text-muted-foreground ml-1">({getCandidateParty(vote.candidateId)})</span>
+                      </TableCell>
+                    </TableRow>
+                  ))
                 )}
               </TableBody>
             </Table>
@@ -153,27 +182,27 @@ export default function Explorer() {
 
           {totalPages > 1 && (
             <div className="flex justify-center mt-4">
-              <Pagination>
+              <div className="flex space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  onClick={() => setPage(page => Math.max(1, page - 1))}
                   disabled={page === 1}
                 >
                   Previous
                 </Button>
-                <div className="mx-4 flex items-center">
+                <div className="flex items-center text-sm">
                   Page {page} of {totalPages}
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => setPage(page => Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
                 >
                   Next
                 </Button>
-              </Pagination>
+              </div>
             </div>
           )}
         </CardContent>

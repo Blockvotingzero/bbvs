@@ -38,12 +38,12 @@ export default function Vote() {
       // Save vote to localStorage for this demo
       localStorage.setItem("hasVoted", "true");
       localStorage.setItem("votedFor", selectedCandidate.toString());
-
+      
       setHasVoted(true);
       setIsVoting(false);
       
       toast({
-        title: "Vote Cast Successfully",
+        title: "Vote submitted successfully!",
         description: "Your vote has been recorded on the blockchain.",
       });
     }, 2000);
@@ -61,7 +61,7 @@ export default function Vote() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Cast Your Vote</h1>
-        <p className="text-muted-foreground">Select a candidate to vote for in the current election</p>
+        <p className="text-muted-foreground">Your vote is secure and anonymous on the blockchain</p>
       </div>
 
       {hasVoted ? (
@@ -96,7 +96,7 @@ export default function Vote() {
                       <span className="text-sm">{candidate.votes.toLocaleString()}</span>
                     </div>
                     <Progress 
-                      value={(candidate.votes / candidates.reduce((sum, c) => sum + c.votes, 0)) * 100}
+                      value={(candidate.votes / candidates.reduce((sum, c) => sum + c.votes, 0)) * 100} 
                       className="h-2"
                       style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
                       indicator={{ style: { backgroundColor: COLORS[index] } }}
@@ -112,41 +112,43 @@ export default function Vote() {
               <CardTitle>Select Your Candidate</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
-                {candidates.map((candidate) => (
-                  <div 
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {candidates.map((candidate, index) => (
+                  <Card 
                     key={candidate.id}
-                    className={`p-4 border rounded-lg flex items-center gap-3 cursor-pointer transition-colors ${
-                      selectedCandidate === candidate.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
-                    }`}
+                    className={`cursor-pointer transition-all duration-200 ${selectedCandidate === candidate.id ? 'ring-2 ring-primary' : ''}`}
                     onClick={() => setSelectedCandidate(candidate.id)}
                   >
-                    <div className="w-4 h-4 rounded-full border flex items-center justify-center">
-                      {selectedCandidate === candidate.id && (
-                        <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-medium">{candidate.name}</div>
-                      <div className="text-sm text-muted-foreground">{candidate.party}</div>
-                    </div>
-                  </div>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-4">
+                        <div 
+                          className="w-12 h-12 rounded-full flex items-center justify-center text-white"
+                          style={{ backgroundColor: COLORS[index] }}
+                        >
+                          {candidate.name.charAt(0)}
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{candidate.name}</h3>
+                          <p className="text-sm text-muted-foreground">{candidate.party}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-              
-              <Button
-                className="w-full mt-6"
-                size="lg"
-                disabled={!selectedCandidate || isVoting}
-                onClick={onVoteSubmit}
+
+              <Button 
+                onClick={onVoteSubmit} 
+                disabled={!selectedCandidate || isVoting} 
+                className="w-full"
               >
                 {isVoting ? (
                   <>
-                    <span className="animate-spin mr-2">⟳</span>
-                    Recording Vote on Blockchain...
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
+                    Recording on Blockchain...
                   </>
                 ) : (
-                  "Cast Your Vote"
+                  "Confirm & Submit Vote"
                 )}
               </Button>
             </CardContent>
