@@ -1,44 +1,55 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Skeleton } from "@/components/ui/skeleton";
-import { type Vote, type Candidate } from "@shared/schema";
+
+import { useState, useEffect } from "react";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import NigeriaMap from "@/components/NigeriaMap";
-import LiveVotes from "@/components/LiveVotes"; // Import NigeriaMap component
+import { getCandidates, getVotes } from "@/lib/mockBlockchainData";
 
 export default function Home() {
-  const { data: votes, isLoading: votesLoading } = useQuery<Vote[]>({
-    queryKey: ["/api/votes"]
-  });
+  const [votes, setVotes] = useState([]);
+  const [candidates, setCandidates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data: candidates, isLoading: candidatesLoading } = useQuery<Candidate[]>({
-    queryKey: ["/api/candidates"]
-  });
+  useEffect(() => {
+    // Simulate blockchain data fetch
+    setTimeout(() => {
+      setVotes(getVotes());
+      setCandidates(getCandidates());
+      setIsLoading(false);
+    }, 1000);
+  }, []);
 
-  if (votesLoading || candidatesLoading) {
-    return <div className="space-y-4">
-      <Skeleton className="h-[400px] w-full" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Skeleton className="h-[200px]" />
-        <Skeleton className="h-[200px]" />
-        <Skeleton className="h-[200px]" />
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    </div>;
+    );
   }
 
-  if (!votes || !candidates) return null;
-
-  const votesByCandidate = candidates.map(candidate => ({
+  // Prepare chart data
+  const pieData = candidates.map(candidate => ({
     name: candidate.name,
-    votes: votes.filter(vote => vote.candidateId === candidate.id).length
+    value: candidate.votes,
+    party: candidate.party
   }));
+
+  const COLORS = ['#FF8042', '#00C49F', '#0088FE'];
+
+  const totalVotes = candidates.reduce((sum, candidate) => sum + candidate.votes, 0);
+  const formattedTotalVotes = totalVotes.toLocaleString();
+
+  const renderPercentage = (value) => {
+    return `${((value / totalVotes) * 100).toFixed(1)}%`;
+  };
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Live Voting Statistics</h1>
         <p className="text-muted-foreground">Real-time overview of the current election results</p>
-        <NigeriaMap /> {/* Add NigeriaMap component here */}
+        <NigeriaMap />
       </div>
 
       <div className="space-y-4 mb-8">
@@ -51,72 +62,101 @@ export default function Home() {
               <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
                 {(() => {
                   const totalVotes = votes.length;
-                  const apcVotes = (votes.filter(v => v.candidateId === 1).length / totalVotes) * 100;
-                  const lpVotes = (votes.filter(v => v.candidateId === 2).length / totalVotes) * 100;
-                  const pdpVotes = (votes.filter(v => v.candidateId === 3).length / totalVotes) * 100;
-
+                  if (totalVotes === 0) return null;
+                  
+                  const apcVotes = candidates.find(c => c.id === 1)?.votes || 0;
+                  const lpVotes = candidates.find(c => c.id === 2)?.votes || 0;
+                  const pdpVotes = candidates.find(c => c.id === 3)?.votes || 0;
+                  
+                  const apcPercentage = (apcVotes / totalVotes) * 100;
+                  const lpPercentage = (lpVotes / totalVotes) * 100;
+                  const pdpPercentage = (pdpVotes / totalVotes) * 100;
+                  
                   return (
-                    <>
-                      <div className="flex h-full">
-                        <div style={{ width: `${apcVotes}%` }} className="bg-red-500"></div>
-                        <div style={{ width: `${lpVotes}%` }} className="bg-blue-500"></div>
-                        <div style={{ width: `${pdpVotes}%` }} className="bg-green-500"></div>
-                      </div>
-                    </>
+                    <div className="flex h-full">
+                      <div className="bg-[#FF8042]" style={{ width: `${apcPercentage}%` }}></div>
+                      <div className="bg-[#00C49F]" style={{ width: `${lpPercentage}%` }}></div>
+                      <div className="bg-[#0088FE]" style={{ width: `${pdpPercentage}%` }}></div>
+                    </div>
                   );
                 })()}
               </div>
-              <div className="flex justify-center gap-4 text-sm">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-red-500 rounded-[20%] mr-1"></div>
-                  <span>APC</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-blue-500 rounded-[20%] mr-1"></div>
-                  <span>LP</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-[20%] mr-1"></div>
-                  <span>PDP</span>
-                </div>
+
+              <div className="flex justify-between text-sm">
+                {candidates.map((candidate, index) => (
+                  <div key={candidate.id} className="flex items-center">
+                    <div 
+                      className="w-3 h-3 rounded-full mr-1" 
+                      style={{ backgroundColor: COLORS[index] }}
+                    ></div>
+                    <span>{candidate.party}: {renderPercentage(candidate.votes)}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="w-full">
-          <CardContent className="p-4">
-            <LiveVotes />
-          </CardContent>
-        </Card>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {candidates.map(candidate => {
-          const candidateVotes = votes.filter(vote => vote.candidateId === candidate.id).length;
-          const percentage = ((candidateVotes / votes.length) * 100).toFixed(1);
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Candidate Vote Count</CardTitle>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [value, 'Votes']} />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
-          return (
-            <Card key={candidate.id}>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                    <svg className="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+          <Card>
+            <CardHeader>
+              <CardTitle>Voting Statistics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm font-medium">Total Votes Cast</span>
+                    <span className="text-sm">{formattedTotalVotes}</span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{candidate.name}</h3>
-                    <p className="text-sm text-muted-foreground">{candidate.party}</p>
+                  <Progress value={100} />
+                </div>
+
+                {candidates.map((candidate, index) => (
+                  <div key={candidate.id}>
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm font-medium">{candidate.name} ({candidate.party})</span>
+                      <span className="text-sm">{candidate.votes.toLocaleString()}</span>
+                    </div>
+                    <Progress 
+                      value={(candidate.votes / totalVotes) * 100} 
+                      className="h-2"
+                      style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+                      indicator={{ style: { backgroundColor: COLORS[index] } }}
+                    />
                   </div>
-                </div>
-                <div className="mt-4">
-                  <p className="text-2xl font-bold">{candidateVotes} votes</p>
-                  <p className="text-sm text-muted-foreground">{percentage}% of total votes</p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
