@@ -284,3 +284,11 @@ export default function Vote() {
     </div>
   );
 }
+export default function Vote() {
+  return (
+    <div>
+      <h1 className="text-3xl font-bold mb-6">Vote Page</h1>
+      <p className="text-muted-foreground">This is the voting interface where users can cast their votes securely on the blockchain.</p>
+    </div>
+  )
+}
