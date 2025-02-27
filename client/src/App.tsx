@@ -1,40 +1,49 @@
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Route, Router } from "wouter";
+import { Switch, Route } from "wouter";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
+import { Toaster } from "@/components/ui/toaster";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Vote from "./pages/Vote";
-import Results from "./pages/Results";
+import Login from "./pages/Login";
+import OTPVerification from "./pages/OTPVerification";
 import LivenessCheck from "./pages/LivenessCheck";
-import { Toaster } from "./components/ui/toaster";
+import Vote from "./pages/Vote";
+import Explorer from "./pages/Explorer";
+import NotFound from "./pages/not-found";
 
-// Mock data that will later be replaced with blockchain API calls
-import { mockCandidates, mockVotes } from "./mockData";
+function Router() {
+  return (
+    <Layout>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/login" component={Login} />
+        <Route path="/otp" component={OTPVerification} />
+        <Route path="/liveness" component={LivenessCheck} />
+        <Route path="/vote">
+          {() => {
+            const nin = localStorage.getItem('userNIN');
+            if (!nin) {
+              localStorage.setItem('intendedPath', '/vote');
+              setLocation('/login');
+              return null;
+            }
+            return <Vote />;
+          }}
+        </Route>
+        <Route path="/explorer" component={Explorer} />
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
+  );
+}
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-// Initialize mock data
-queryClient.setQueryData(["candidates"], mockCandidates);
-queryClient.setQueryData(["votes"], mockVotes);
-
-export default function App() {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Layout>
-          <Route path="/" component={Home} />
-          <Route path="/vote" component={Vote} />
-          <Route path="/results" component={Results} />
-          <Route path="/liveness-check" component={LivenessCheck} />
-        </Layout>
-      </Router>
+      <Router />
       <Toaster />
     </QueryClientProvider>
   );
 }
+
+export default App;

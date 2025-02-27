@@ -15,7 +15,6 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Start Frontend"
 
 [[workflows.workflow]]
 name = "Project"
@@ -40,11 +39,3 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Start Frontend"
-author = 40057088
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd client && npx vite --port 5000 --host 0.0.0.0"
