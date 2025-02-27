@@ -1,4 +1,3 @@
-
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -12,4 +11,8 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, '../shared')
     },
   },
+  server: {
+    port: 5000,
+    host: true // This makes the server accessible from outside localhost
+  }
 });
