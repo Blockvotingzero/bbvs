@@ -7,14 +7,16 @@ channel = "stable-24_05"
 
 [deployment]
 deploymentTarget = "cloudrun"
-build = ["sh", "-c", "cd client && npm run build"]
+build = ["sh", "-c", "npm run build"]
 run = ["sh", "-c", "npx http-server dist -p 5000"]
 
 [[ports]]
 localPort = 5000
 externalPort = 80
+exposeLocalhost = true
 
 [workflows]
+runButton = "Start application"
 
 [[workflows.workflow]]
 name = "Project"
@@ -37,5 +39,5 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev"
+args = "vite --port 5000"
 waitForPort = 5000
