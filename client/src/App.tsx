@@ -47,24 +47,3 @@ function App() {
 }
 
 export default App;
-import { Route, Switch } from 'wouter'
-import Layout from './components/Layout'
-import Home from './pages/Home'
-import Explorer from './pages/Explorer'
-import Login from './pages/Login'
-import OTPVerification from './pages/OTPVerification'
-import Vote from './pages/Vote'
-
-export default function App() {
-  return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/explorer" component={Explorer} />
-        <Route path="/login" component={Login} />
-        <Route path="/otp" component={OTPVerification} />
-        <Route path="/vote" component={Vote} />
-      </Switch>
-    </Layout>
-  )
-}
