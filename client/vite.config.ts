@@ -12,7 +12,11 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0', // This makes the server accessible from outside localhost
     port: 5000,
-    host: true // This makes the server accessible from outside localhost
+    strictPort: true, // Ensures the server only tries to use the specified port
+    hmr: {
+      clientPort: 443 // Required for Replit's environment
+    }
   }
 });
