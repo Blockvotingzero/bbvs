@@ -9,7 +9,7 @@ export default function NigeriaMap() {
   const getVoteStats = (state: string | null) => {
     // For now, we'll return mock statistics since we don't have state-specific data
     const votes = mockVotes;
-    const stateVotes = state === "all" || !state ? votes : votes.filter(v => v.state === state);
+    const stateVotes = state === "all" || !state ? votes : votes.filter(v => (v as any).state === state);
     return {
       total: stateVotes.length,
       tinubu: stateVotes.filter(v => v.candidateId === 1).length,
@@ -52,8 +52,14 @@ export default function NigeriaMap() {
       </div>
 
       <div className="w-full md:w-2/3 order-1 md:order-2">
-        <div className="aspect-[4/3] bg-muted rounded-lg flex items-center justify-center">
-          <p className="text-muted-foreground">Interactive map visualization here</p>
+        <div className="aspect-[4/3] bg-muted rounded-lg overflow-hidden">
+          <iframe 
+            src="https://blockvotingzero.github.io"
+            className="w-full h-full border-0"
+            title="Nigeria Voting Map"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          />
         </div>
       </div>
     </div>
