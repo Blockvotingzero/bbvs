@@ -5,8 +5,11 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
+  ToastAction,
+  type ToastActionElement,
+  type ToastProps,
 } from "@/components/ui/toast"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -32,5 +35,4 @@ export function Toaster() {
   )
 }
 
-export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
-export type ToastActionElement = React.ReactElement<typeof ToastAction>
+export type { ToastProps, ToastActionElement }
