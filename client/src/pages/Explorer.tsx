@@ -46,11 +46,36 @@ export default function Explorer() {
     page * ITEMS_PER_PAGE
   );
 
+  // Get the latest block height
+  const latestBlockHeight = Math.max(...votes.map(vote => vote.blockHeight));
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Blockchain Explorer</h1>
         <p className="text-muted-foreground">View all transactions on the blockchain</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium">Total Votes</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{votes.length.toLocaleString()}</div>
+            <p className="text-sm text-muted-foreground mt-1">Verified transactions on the blockchain</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium">Latest Block</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">{latestBlockHeight.toLocaleString()}</div>
+            <p className="text-sm text-muted-foreground mt-1">Current blockchain height</p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="flex justify-between items-center mb-4">
