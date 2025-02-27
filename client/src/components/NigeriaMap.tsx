@@ -50,7 +50,7 @@ export default function NigeriaMap() {
       </div>
 
       <div className="w-full md:w-2/3 order-1 md:order-2">
-        <div className="aspect-[4/3] bg-muted rounded-lg overflow-hidden">
+        <div className="aspect-[16/9] max-h-[500px] bg-muted rounded-lg overflow-hidden">
           <iframe 
             src="https://blockvotingzero.github.io"
             className="w-full h-full border-0"
