@@ -161,3 +161,74 @@ export default function Home() {
     </div>
   );
 }
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useCandidates, useVotes } from "@/hooks/useApi";
+
+export default function Home() {
+  const [, setLocation] = useLocation();
+  const { data: candidates = [] } = useCandidates();
+  const { data: votes = [] } = useVotes();
+
+  const totalVotes = votes.length;
+  
+  return (
+    <div className="container py-12">
+      <div className="max-w-4xl mx-auto text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">
+          Secure Blockchain Voting System
+        </h1>
+        <p className="text-xl text-muted-foreground mb-8">
+          A transparent and secure way to cast your vote using blockchain technology
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-card border rounded-lg p-6">
+            <div className="text-4xl font-bold mb-2">{candidates.length}</div>
+            <div className="text-muted-foreground">Candidates</div>
+          </div>
+          <div className="bg-card border rounded-lg p-6">
+            <div className="text-4xl font-bold mb-2">{totalVotes}</div>
+            <div className="text-muted-foreground">Votes Cast</div>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" onClick={() => setLocation("/liveness-check")}>
+            Cast Your Vote
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => setLocation("/results")}
+          >
+            View Results
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid gap-8 md:grid-cols-3">
+        {candidates.map(candidate => (
+          <div key={candidate.id} className="bg-card border rounded-lg p-6 text-center">
+            <div className="mx-auto w-24 h-24 rounded-full overflow-hidden mb-4">
+              <img
+                src={candidate.avatar}
+                alt={candidate.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <h3 className="text-xl font-medium mb-1">{candidate.name}</h3>
+            <p className="text-muted-foreground mb-4">{candidate.party}</p>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setLocation("/liveness-check")}
+            >
+              Vote for {candidate.name.split(' ')[0]}
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

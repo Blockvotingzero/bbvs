@@ -34,3 +34,8 @@ export function Toaster() {
 
 export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 export type ToastActionElement = React.ReactElement<typeof ToastAction>
+import { ToastProvider } from "./use-toast";
+
+export function Toaster({ children }: { children?: React.ReactNode }) {
+  return <ToastProvider>{children}</ToastProvider>;
+}
