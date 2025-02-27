@@ -1,23 +1,23 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import NigeriaMap from "@/components/NigeriaMap";
-import { getCandidates, getVotes } from "@/lib/mockBlockchainData";
+import { mockCandidates, mockVotes } from "@/lib/mockData";
+import type { Vote, Candidate } from "@/types/schema";
 
 export default function Home() {
-  const [votes, setVotes] = useState([]);
-  const [candidates, setCandidates] = useState([]);
+  const [votes, setVotes] = useState<Vote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate blockchain data fetch
-    setTimeout(() => {
-      setVotes(getVotes());
-      setCandidates(getCandidates());
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setVotes(mockVotes);
       setIsLoading(false);
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
@@ -28,19 +28,21 @@ export default function Home() {
     );
   }
 
-  // Prepare chart data
-  const pieData = candidates.map(candidate => ({
-    name: candidate.name,
-    value: candidate.votes,
-    party: candidate.party
-  }));
+  // Calculate vote distribution
+  const voteDistribution = mockCandidates.map(candidate => {
+    const candidateVotes = votes.filter(vote => vote.candidateId === candidate.id).length;
+    return {
+      name: candidate.name,
+      value: candidateVotes,
+      party: candidate.party
+    };
+  });
 
   const COLORS = ['#FF8042', '#00C49F', '#0088FE'];
-
-  const totalVotes = candidates.reduce((sum, candidate) => sum + candidate.votes, 0);
+  const totalVotes = votes.length;
   const formattedTotalVotes = totalVotes.toLocaleString();
 
-  const renderPercentage = (value) => {
+  const renderPercentage = (value: number) => {
     return `${((value / totalVotes) * 100).toFixed(1)}%`;
   };
 
@@ -60,36 +62,28 @@ export default function Home() {
           <CardContent>
             <div className="space-y-2">
               <div className="w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
-                {(() => {
-                  const totalVotes = votes.length;
-                  if (totalVotes === 0) return null;
-                  
-                  const apcVotes = candidates.find(c => c.id === 1)?.votes || 0;
-                  const lpVotes = candidates.find(c => c.id === 2)?.votes || 0;
-                  const pdpVotes = candidates.find(c => c.id === 3)?.votes || 0;
-                  
-                  const apcPercentage = (apcVotes / totalVotes) * 100;
-                  const lpPercentage = (lpVotes / totalVotes) * 100;
-                  const pdpPercentage = (pdpVotes / totalVotes) * 100;
-                  
-                  return (
-                    <div className="flex h-full">
-                      <div className="bg-[#FF8042]" style={{ width: `${apcPercentage}%` }}></div>
-                      <div className="bg-[#00C49F]" style={{ width: `${lpPercentage}%` }}></div>
-                      <div className="bg-[#0088FE]" style={{ width: `${pdpPercentage}%` }}></div>
-                    </div>
-                  );
-                })()}
+                <div className="flex h-full">
+                  {voteDistribution.map((dist, index) => (
+                    <div
+                      key={dist.party}
+                      className="h-full"
+                      style={{
+                        backgroundColor: COLORS[index],
+                        width: `${(dist.value / totalVotes) * 100}%`
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
 
               <div className="flex justify-between text-sm">
-                {candidates.map((candidate, index) => (
-                  <div key={candidate.id} className="flex items-center">
-                    <div 
-                      className="w-3 h-3 rounded-full mr-1" 
+                {voteDistribution.map((dist, index) => (
+                  <div key={dist.party} className="flex items-center">
+                    <div
+                      className="w-3 h-3 rounded-full mr-1"
                       style={{ backgroundColor: COLORS[index] }}
-                    ></div>
-                    <span>{candidate.party}: {renderPercentage(candidate.votes)}</span>
+                    />
+                    <span>{dist.party}: {renderPercentage(dist.value)}</span>
                   </div>
                 ))}
               </div>
@@ -106,7 +100,7 @@ export default function Home() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={pieData}
+                    data={voteDistribution}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -115,7 +109,7 @@ export default function Home() {
                     dataKey="value"
                     label={({ name, value }) => `${name}: ${value}`}
                   >
-                    {pieData.map((entry, index) => (
+                    {voteDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -136,20 +130,21 @@ export default function Home() {
                     <span className="text-sm font-medium">Total Votes Cast</span>
                     <span className="text-sm">{formattedTotalVotes}</span>
                   </div>
-                  <Progress value={100} />
+                  <Progress value={100} className="bg-gray-200" />
                 </div>
 
-                {candidates.map((candidate, index) => (
-                  <div key={candidate.id}>
+                {voteDistribution.map((dist, index) => (
+                  <div key={dist.party}>
                     <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">{candidate.name} ({candidate.party})</span>
-                      <span className="text-sm">{candidate.votes.toLocaleString()}</span>
+                      <span className="text-sm font-medium">{dist.name} ({dist.party})</span>
+                      <span className="text-sm">{dist.value.toLocaleString()}</span>
                     </div>
-                    <Progress 
-                      value={(candidate.votes / totalVotes) * 100} 
-                      className="h-2"
-                      style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-                      indicator={{ style: { backgroundColor: COLORS[index] } }}
+                    <Progress
+                      value={(dist.value / totalVotes) * 100}
+                      className="h-2 bg-gray-200"
+                      style={{
+                        "--progress-background": COLORS[index]
+                      } as React.CSSProperties}
                     />
                   </div>
                 ))}

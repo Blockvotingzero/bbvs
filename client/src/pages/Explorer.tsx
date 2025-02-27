@@ -3,23 +3,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { type MockVote, type MockCandidate, getVotes, getCandidates } from "@/lib/mockBlockchainData";
+import { mockVotes, mockCandidates } from "@/lib/mockData";
+import type { Vote } from "@/types/schema";
 
 export default function Explorer() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [votes, setVotes] = useState<MockVote[]>([]);
-  const [candidates, setCandidates] = useState<MockCandidate[]>([]);
+  const [votes, setVotes] = useState<Vote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
-    // Simulate blockchain data fetch
-    setTimeout(() => {
-      setVotes(getVotes());
-      setCandidates(getCandidates());
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setVotes(mockVotes);
       setIsLoading(false);
     }, 800);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
@@ -31,7 +32,7 @@ export default function Explorer() {
   }
 
   const getCandidateName = (candidateId: number) => {
-    return candidates.find(c => c.id === candidateId)?.name || "Unknown";
+    return mockCandidates.find(c => c.id === candidateId)?.name || "Unknown";
   };
 
   const filteredVotes = votes.filter(vote => 
@@ -76,7 +77,7 @@ export default function Explorer() {
             <TableHeader>
               <TableRow>
                 <TableHead>Transaction Hash</TableHead>
-                <TableHead>Block Number</TableHead>
+                <TableHead>Block Height</TableHead>
                 <TableHead>Timestamp</TableHead>
                 <TableHead>Candidate</TableHead>
               </TableRow>
@@ -85,7 +86,7 @@ export default function Explorer() {
               {paginatedVotes.map((vote) => (
                 <TableRow key={vote.transactionHash}>
                   <TableCell className="font-mono">{vote.transactionHash.substring(0, 16)}...</TableCell>
-                  <TableCell>{vote.blockNumber}</TableCell>
+                  <TableCell>{vote.blockHeight}</TableCell>
                   <TableCell>{new Date(vote.timestamp).toLocaleString()}</TableCell>
                   <TableCell>{getCandidateName(vote.candidateId)}</TableCell>
                 </TableRow>
