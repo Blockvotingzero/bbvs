@@ -1,29 +1,15 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { type Candidate } from "@/types/schema";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { type Candidate } from "@shared/schema";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { Check, Copy, Loader2 } from "lucide-react";
+import { mockCandidates } from "@/lib/mockData";
 
 export default function Vote() {
   const [, setLocation] = useLocation();
-
-  // Check if user is authenticated
-  React.useEffect(() => {
-    const nin = localStorage.getItem('userNIN');
-    if (!nin) {
-      setLocation('/login');
-    }
-  }, [setLocation]);
   const { toast } = useToast();
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
@@ -32,62 +18,57 @@ export default function Vote() {
   const [voteHash, setVoteHash] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
   const [votedCandidateName, setVotedCandidateName] = useState<string>("");
+  const [isVoting, setIsVoting] = useState(false);
 
-  const { data: candidates } = useQuery<Candidate[]>({
-    queryKey: ["/api/candidates"]
-  });
+  // Check if user is authenticated
+  React.useEffect(() => {
+    const nin = localStorage.getItem('userNIN');
+    if (!nin) {
+      setLocation('/login');
+    }
+  }, [setLocation]);
 
-  const voteMutation = useMutation({
-    mutationFn: async (data: { candidateId: number }) => {
-      const voteData = {
-        nin: "1234567890", // This should come from auth context
-        phoneNumber: "1234567890", // This should come from auth context
-        candidateId: data.candidateId,
-        otp: "123456" // This should come from OTP verification
-      };
+  // Mock vote submission
+  const handleVoteSubmission = async () => {
+    if (!selectedCandidate) return;
+
+    setIsVoting(true);
+
+    try {
       // Simulate blockchain processing time
       await new Promise(resolve => setTimeout(resolve, 1500));
-      const res = await apiRequest("POST", "/api/vote", voteData);
-      if (!res.ok) {
-        throw new Error("Failed to submit vote");
-      }
-      return res.json();
-    },
-    onSuccess: (data) => {
+
+      // Generate a mock transaction hash
       const hash = "0x" + Array.from(crypto.getRandomValues(new Uint8Array(32)))
         .map(b => b.toString(16).padStart(2, "0"))
         .join("")
         .slice(0, 42);
+
       setVoteHash(hash);
       setHasVoted(true);
       setShowConfirmDialog(false);
       setShowSuccessDialog(true);
       setVotedCandidateName(selectedCandidateName || "");
-      setSelectedCandidate(null); // Reset selection
+      setSelectedCandidate(null);
+
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
       });
-    },
-    onError: (error) => {
-      setShowConfirmDialog(false);
+    } catch (error) {
       toast({
         title: "Error",
         description: "Failed to submit vote. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsVoting(false);
     }
-  });
+  };
 
   const onVoteSubmit = () => {
     if (!selectedCandidate || hasVoted) return;
     setShowConfirmDialog(true);
-  };
-
-  const handleConfirm = () => {
-    if (selectedCandidate) {
-      voteMutation.mutate({ candidateId: selectedCandidate });
-    }
   };
 
   const handleCopyHash = async () => {
@@ -96,7 +77,7 @@ export default function Vote() {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const selectedCandidateName = candidates?.find(c => c.id === selectedCandidate)?.name;
+  const selectedCandidateName = mockCandidates.find(c => c.id === selectedCandidate)?.name;
 
   return (
     <div className="max-w-4xl mx-auto px-4">
@@ -108,9 +89,8 @@ export default function Vote() {
             </svg>
           </div>
           <div>
-            <h2 className="text-2xl font-semibold">Abubakar</h2>
-            <p className="text-muted-foreground">Date of Birth: 4th November 2000</p>
-            <p className="text-muted-foreground mt-1">NIN: {localStorage.getItem('userNIN')}</p>
+            <h2 className="text-2xl font-semibold">Voter Profile</h2>
+            <p className="text-muted-foreground">NIN: {localStorage.getItem('userNIN')}</p>
           </div>
         </div>
       </div>
@@ -147,7 +127,7 @@ export default function Vote() {
 
       <h1 className="text-3xl font-bold mb-8">Select a Candidate</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {candidates?.map((candidate) => (
+        {mockCandidates?.map((candidate) => (
           <Card
             key={candidate.id}
             className={`cursor-pointer transition-colors ${
@@ -171,13 +151,14 @@ export default function Vote() {
           </Card>
         ))}
       </div>
+
       <Button
         className="mt-8 w-full"
-        disabled={!selectedCandidate || voteMutation.isPending || hasVoted}
+        disabled={!selectedCandidate || isVoting || hasVoted}
         onClick={onVoteSubmit}
         variant={hasVoted ? "secondary" : "default"}
       >
-        {voteMutation.isPending ? (
+        {isVoting ? (
           <div className="flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
             Submitting Vote...
@@ -197,7 +178,7 @@ export default function Vote() {
               Confirm Your Vote
             </DialogTitle>
             <DialogDescription>
-              {!voteMutation.isPending ? (
+              {!isVoting ? (
                 <p>Are you sure you want to vote for {selectedCandidateName}? This action cannot be undone.</p>
               ) : (
                 <div className="flex flex-col items-center justify-center py-4">
@@ -208,12 +189,12 @@ export default function Vote() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            {!voteMutation.isPending && (
+            {!isVoting && (
               <>
                 <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleConfirm}>
+                <Button onClick={handleVoteSubmission}>
                   Continue
                 </Button>
               </>
@@ -237,7 +218,7 @@ export default function Vote() {
                       <div className="text-sm text-muted-foreground">You voted for</div>
                       <div className="text-lg sm:text-xl font-semibold">{votedCandidateName}</div>
                     </div>
-                    
+
                     <div>
                       <div className="text-sm text-muted-foreground mb-2">Your vote hash (click to copy)</div>
                       <div 
@@ -267,7 +248,7 @@ export default function Vote() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="text-sm text-muted-foreground text-center">
                   Please save this hash to track your vote on the blockchain
                 </div>
