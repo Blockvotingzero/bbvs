@@ -11,10 +11,6 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, '../shared')
     },
   },
-  build: {
-    outDir: './dist',
-    emptyOutDir: true
-  },
   server: {
     port: 5000,
     host: true // This makes the server accessible from outside localhost
