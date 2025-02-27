@@ -1,4 +1,3 @@
-
 // Static mock data for the voting application
 export interface User {
   id: number;
@@ -11,85 +10,83 @@ export interface Candidate {
   id: number;
   name: string;
   party: string;
-  avatar: string;
+  votes: number;
+  image: string;
 }
 
 export interface Vote {
   id: number;
   candidateId: number;
-  voterHash: string;
   timestamp: string;
-  blockHeight: number;
   transactionHash: string;
 }
 
-// Mock candidates data
-export const candidates: Candidate[] = [
-  { 
-    id: 1, 
-    name: "Bola Ahmed Tinubu", 
-    party: "APC", 
-    avatar: "https://avatars.githubusercontent.com/u/1?v=4" 
+export const staticCandidates: Candidate[] = [
+  {
+    id: 1,
+    name: "Bola Tinubu",
+    party: "APC",
+    votes: 124,
+    image: "https://placekitten.com/200/200?1"
   },
-  { 
-    id: 2, 
-    name: "Peter Obi", 
-    party: "LP", 
-    avatar: "https://avatars.githubusercontent.com/u/2?v=4" 
+  {
+    id: 2,
+    name: "Peter Obi",
+    party: "LP",
+    votes: 98,
+    image: "https://placekitten.com/200/200?2"
   },
-  { 
-    id: 3, 
-    name: "Atiku Abubakar", 
-    party: "PDP", 
-    avatar: "https://avatars.githubusercontent.com/u/3?v=4" 
+  {
+    id: 3,
+    name: "Atiku Abubakar",
+    party: "PDP",
+    votes: 87,
+    image: "https://placekitten.com/200/200?3"
   }
 ];
 
-// Generate mock votes data
-const generateMockVotes = (): Vote[] => {
-  const votes: Vote[] = [];
-  let id = 1;
-  
-  // Start time: 7 days ago
-  const startTime = new Date();
-  startTime.setDate(startTime.getDate() - 7);
-  
-  // Generate random votes
-  for (let i = 0; i < 1000; i++) {
-    const candidateId = Math.floor(Math.random() * 3) + 1;
-    
-    // Generate timestamp between start time and now
-    const timestamp = new Date(
-      startTime.getTime() + Math.random() * (Date.now() - startTime.getTime())
-    ).toISOString();
+export const staticVotes: Vote[] = [
+  {
+    id: 1,
+    candidateId: 1,
+    timestamp: "2023-10-01T12:00:00Z",
+    transactionHash: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+  },
+  {
+    id: 2,
+    candidateId: 2,
+    timestamp: "2023-10-01T12:15:00Z",
+    transactionHash: "0x2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3"
+  },
+  {
+    id: 3,
+    candidateId: 3,
+    timestamp: "2023-10-01T12:30:00Z",
+    transactionHash: "0x3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4"
+  }
+];
 
-    votes.push({
-      id: id++,
-      candidateId,
-      voterHash: `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
-      timestamp,
-      blockHeight: 1000000 + i, // Simulating increasing block heights
-      transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
-    });
+// Initialize local storage with static data if it doesn't exist
+export const initializeLocalStorage = () => {
+  if (!localStorage.getItem('candidates')) {
+    localStorage.setItem('candidates', JSON.stringify(staticCandidates));
   }
 
-  // Sort by timestamp, most recent first
-  return votes.sort((a, b) => 
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  );
+  if (!localStorage.getItem('votes')) {
+    localStorage.setItem('votes', JSON.stringify(staticVotes));
+  }
 };
 
-// Generate and export votes
-export const votes: Vote[] = generateMockVotes();
-
-// Mock verification function (simulates server verification)
+// Mock verification function (simulates server verification)  - now uses local storage
 export const verifyUser = async (nin: string, phoneNumber: string): Promise<{success: boolean, otp: string}> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1000));
+  //  In a real app, you would verify against a database or other secure method.
+  // This is a placeholder for simplicity.
   return { success: true, otp: "123456" };
 };
 
-// Mock voting function (simulates server vote)
+// Mock voting function (simulates server vote) - now uses local storage
 export const castVote = async (params: {
   nin: string, 
   phoneNumber: string, 
@@ -103,14 +100,23 @@ export const castVote = async (params: {
     return { success: false, vote: null };
   }
   
+  const candidates = JSON.parse(localStorage.getItem('candidates') || '[]') as Candidate[];
+  const candidateIndex = candidates.findIndex(c => c.id === params.candidateId);
+
+  if(candidateIndex === -1) {
+    return {success: false, vote: null};
+  }
+
+  candidates[candidateIndex].votes++;
+  localStorage.setItem('candidates', JSON.stringify(candidates));
+
   const newVote: Vote = {
-    id: votes.length + 1,
+    id: (JSON.parse(localStorage.getItem('votes') || '[]') as Vote[]).length + 1,
     candidateId: params.candidateId,
-    voterHash: `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
     timestamp: new Date().toISOString(),
-    blockHeight: 1000000 + votes.length,
     transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
   };
-  
+  localStorage.setItem('votes', JSON.stringify([...JSON.parse(localStorage.getItem('votes') || '[]') as Vote[], newVote]));
+
   return { success: true, vote: newVote };
 };
