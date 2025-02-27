@@ -1,40 +1,37 @@
-
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { type MockVote, type MockCandidate, getVotes, getCandidates } from "@/lib/mockBlockchainData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { getVotes, getCandidates } from "@/lib/mockBlockchainData";
 
 export default function Explorer() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [votes, setVotes] = useState<MockVote[]>([]);
-  const [candidates, setCandidates] = useState<MockCandidate[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const ITEMS_PER_PAGE = 20;
-  const COLORS = ['#FF8042', '#00C49F', '#0088FE'];
-
-  useEffect(() => {
-    // Simulate blockchain data fetch
-    setTimeout(() => {
-      setVotes(getVotes());
-      setCandidates(getCandidates());
-      setIsLoading(false);
-    }, 800);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  const votes = getVotes();
+  const candidates = getCandidates();
+  const ITEMS_PER_PAGE = 10;
 
   const getCandidateName = (candidateId: number) => {
-    return candidates.find(c => c.id === candidateId)?.name || "Unknown";
+    const candidate = candidates.find((c) => c.id === candidateId);
+    return candidate ? candidate.name : "Unknown";
+  };
+
+  const getCandidateParty = (candidateId: number) => {
+    const candidate = candidates.find((c) => c.id === candidateId);
+    return candidate ? candidate.party : "Unknown";
+  };
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString();
   };
 
   const filteredVotes = votes.filter(vote => 
@@ -65,108 +62,43 @@ export default function Explorer() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Votes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalVotes.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Votes recorded on the blockchain
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Transactions recorded on blockchain</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Unique Voters</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{uniqueVoters.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Distinct wallet addresses
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Distinct wallet addresses</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Latest Block</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">#{latestBlock.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Current blockchain height
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Current blockchain height</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Block Time</CardTitle>
+            <CardTitle className="text-sm font-medium">Avg Block Time</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{averageBlockTime}s</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Average time between blocks
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Time between blocks</p>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Candidate Vote Distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Vote Distribution</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {candidates.map((candidate, index) => {
-              const candidateVotes = votes.filter(v => v.candidateId === candidate.id).length;
-              const percentage = totalVotes > 0 ? (candidateVotes / totalVotes) * 100 : 0;
-              
-              return (
-                <div key={candidate.id}>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium">{candidate.name} ({candidate.party})</span>
-                    <span className="text-sm">{candidateVotes.toLocaleString()} ({percentage.toFixed(1)}%)</span>
-                  </div>
-                  <Progress 
-                    value={percentage} 
-                    className="h-2"
-                    style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-                    indicator={{ style: { backgroundColor: COLORS[index] } }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          
-          <div className="flex justify-between text-sm mt-4">
-            {candidates.map((candidate, index) => (
-              <div key={candidate.id} className="flex items-center">
-                <div 
-                  className="w-3 h-3 rounded-full mr-1" 
-                  style={{ backgroundColor: COLORS[index] }}
-                ></div>
-                <span>{candidate.party}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-between items-center mb-4">
-        <Input
-          placeholder="Search by transaction hash or candidate name"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          className="max-w-sm"
-        />
-        <div className="text-sm text-muted-foreground">
-          Showing {filteredVotes.length} transactions
-        </div>
       </div>
 
       <Card>
@@ -174,48 +106,74 @@ export default function Explorer() {
           <CardTitle>Transaction History</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Transaction Hash</TableHead>
-                <TableHead>Block Number</TableHead>
-                <TableHead>Timestamp</TableHead>
-                <TableHead>Candidate</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedVotes.map((vote) => (
-                <TableRow key={vote.transactionHash}>
-                  <TableCell className="font-mono">{vote.transactionHash.substring(0, 16)}...</TableCell>
-                  <TableCell>{vote.blockNumber}</TableCell>
-                  <TableCell>{new Date(vote.timestamp).toLocaleString()}</TableCell>
-                  <TableCell>{getCandidateName(vote.candidateId)}</TableCell>
+          <div className="flex items-center mb-4">
+            <Input
+              placeholder="Search by transaction hash or candidate name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-sm mr-2"
+            />
+            <Button variant="outline" onClick={() => setSearch("")}>Clear</Button>
+          </div>
+
+          <div className="border rounded-md">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Transaction Hash</TableHead>
+                  <TableHead>Block</TableHead>
+                  <TableHead>Timestamp</TableHead>
+                  <TableHead>Voter Address</TableHead>
+                  <TableHead>Candidate</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {paginatedVotes.map((vote) => (
+                  <TableRow key={vote.id}>
+                    <TableCell className="font-mono">{vote.transactionHash}</TableCell>
+                    <TableCell>#{vote.blockNumber.toLocaleString()}</TableCell>
+                    <TableCell>{formatDate(vote.timestamp)}</TableCell>
+                    <TableCell className="font-mono">{vote.voterAddress.slice(0, 10)}...</TableCell>
+                    <TableCell>
+                      {getCandidateName(vote.candidateId)} ({getCandidateParty(vote.candidateId)})
+                    </TableCell>
+                  </TableRow>
+                ))}
+
+                {paginatedVotes.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      No transactions found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(page => Math.max(page - 1, 1))}
-                disabled={page === 1}
-              >
-                Previous
-              </Button>
-              <div className="text-sm">
-                Page {page} of {totalPages}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(page => Math.min(page + 1, totalPages))}
-                disabled={page === totalPages}
-              >
-                Next
-              </Button>
+            <div className="flex justify-center mt-4">
+              <Pagination>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <div className="mx-4 flex items-center">
+                  Page {page} of {totalPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </Button>
+              </Pagination>
             </div>
           )}
         </CardContent>

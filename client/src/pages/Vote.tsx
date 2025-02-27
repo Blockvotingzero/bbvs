@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ export default function Vote() {
 
       setHasVoted(true);
       setIsVoting(false);
-
+      
       toast({
         title: "Vote Cast Successfully",
         description: "Your vote has been recorded on the blockchain.",
@@ -95,7 +96,7 @@ export default function Vote() {
                       <span className="text-sm">{candidate.votes.toLocaleString()}</span>
                     </div>
                     <Progress 
-                      value={(candidate.votes / candidates.reduce((sum, c) => sum + c.votes, 0)) * 100} 
+                      value={(candidate.votes / candidates.reduce((sum, c) => sum + c.votes, 0)) * 100}
                       className="h-2"
                       style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
                       indicator={{ style: { backgroundColor: COLORS[index] } }}
@@ -106,51 +107,50 @@ export default function Vote() {
             </CardContent>
           </Card>
 
-          <h2 className="text-2xl font-bold mt-8 mb-4">Select a Candidate</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {candidates.map((candidate, index) => (
-              <Card
-                key={candidate.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  selectedCandidate === candidate.id ? "border-2 border-primary" : ""
-                }`}
-                onClick={() => setSelectedCandidate(candidate.id)}
-              >
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-4">
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center"
-                      style={{ backgroundColor: COLORS[index] }}
-                    >
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+          <Card>
+            <CardHeader>
+              <CardTitle>Select Your Candidate</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {candidates.map((candidate) => (
+                  <div 
+                    key={candidate.id}
+                    className={`p-4 border rounded-lg flex items-center gap-3 cursor-pointer transition-colors ${
+                      selectedCandidate === candidate.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                    }`}
+                    onClick={() => setSelectedCandidate(candidate.id)}
+                  >
+                    <div className="w-4 h-4 rounded-full border flex items-center justify-center">
+                      {selectedCandidate === candidate.id && (
+                        <div className="w-2 h-2 rounded-full bg-primary"></div>
+                      )}
                     </div>
                     <div>
-                      <h3 className="font-semibold">{candidate.name}</h3>
-                      <p className="text-sm text-muted-foreground">{candidate.party}</p>
+                      <div className="font-medium">{candidate.name}</div>
+                      <div className="text-sm text-muted-foreground">{candidate.party}</div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <Button
-            className="w-full mt-6"
-            size="lg"
-            disabled={!selectedCandidate || isVoting}
-            onClick={onVoteSubmit}
-          >
-            {isVoting ? (
-              <>
-                <span className="animate-spin mr-2">⟳</span>
-                Recording Vote on Blockchain...
-              </>
-            ) : (
-              "Cast Your Vote"
-            )}
-          </Button>
+                ))}
+              </div>
+              
+              <Button
+                className="w-full mt-6"
+                size="lg"
+                disabled={!selectedCandidate || isVoting}
+                onClick={onVoteSubmit}
+              >
+                {isVoting ? (
+                  <>
+                    <span className="animate-spin mr-2">⟳</span>
+                    Recording Vote on Blockchain...
+                  </>
+                ) : (
+                  "Cast Your Vote"
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         </>
       )}
     </div>
