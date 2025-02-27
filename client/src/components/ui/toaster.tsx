@@ -1,3 +1,4 @@
+
 import {
   Toast,
   ToastClose,
@@ -7,6 +8,7 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import React from "react"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -31,6 +33,3 @@ export function Toaster() {
     </ToastProvider>
   )
 }
-
-export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
-export type ToastActionElement = React.ReactElement<typeof ToastAction>
