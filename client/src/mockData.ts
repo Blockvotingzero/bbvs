@@ -68,3 +68,98 @@ export async function submitVote(data: {
     }, 1500);
   });
 }
+export interface Candidate {
+  id: number;
+  name: string;
+  party: string;
+  avatar: string;
+  bio: string;
+}
+
+export interface Vote {
+  id: number;
+  candidateId: number;
+  voterHash: string;
+  timestamp: string;
+  blockHeight: number;
+  transactionHash: string;
+}
+
+// Mock candidate data
+export const candidates: Candidate[] = [
+  {
+    id: 1,
+    name: "Jane Smith",
+    party: "Progressive Party",
+    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Jane",
+    bio: "Experienced lawmaker focused on healthcare reform and education."
+  },
+  {
+    id: 2,
+    name: "John Doe",
+    party: "Liberty Alliance",
+    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=John",
+    bio: "Business leader and advocate for fiscal responsibility and economic growth."
+  },
+  {
+    id: 3,
+    name: "Alex Johnson",
+    party: "Unity Coalition",
+    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Alex",
+    bio: "Community organizer with a platform focused on environmental sustainability."
+  }
+];
+
+// Generate mock votes
+const generateMockVotes = (): Vote[] => {
+  const votes: Vote[] = [];
+  let id = 1;
+  
+  // Start time: 7 days ago
+  const startTime = new Date();
+  startTime.setDate(startTime.getDate() - 7);
+  
+  // Generate random votes
+  for (let i = 0; i < 1000; i++) {
+    const candidateId = Math.floor(Math.random() * 3) + 1;
+    
+    // Generate timestamp between start time and now
+    const timestamp = new Date(
+      startTime.getTime() + Math.random() * (Date.now() - startTime.getTime())
+    ).toISOString();
+
+    votes.push({
+      id: id++,
+      candidateId,
+      voterHash: `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
+      timestamp,
+      blockHeight: 1000000 + i, // Simulating increasing block heights
+      transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
+    });
+  }
+
+  // Sort by timestamp, most recent first
+  return votes.sort((a, b) => 
+    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+};
+
+// Mock votes data
+export const votes: Vote[] = generateMockVotes();
+
+// Mock verification function (simulates blockchain verification)
+export const verifyUser = async (nin: string, phoneNumber: string): Promise<{success: boolean, otp: string}> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return { success: true, otp: "123456" };
+};
+
+// Mock submit vote function (simulates blockchain transaction)
+export const submitVote = async (candidateId: number): Promise<{success: boolean, txHash: string}> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  return { 
+    success: true, 
+    txHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
+  };
+};

@@ -52,3 +52,38 @@ export function useSubmitVote() {
     }
   });
 }
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { candidates, votes, verifyUser, submitVote } from '../mockData';
+
+// Hook to fetch candidates
+export function useCandidates() {
+  return useQuery({
+    queryKey: ['candidates'],
+    queryFn: () => Promise.resolve(candidates),
+    initialData: candidates,
+  });
+}
+
+// Hook to fetch votes
+export function useVotes() {
+  return useQuery({
+    queryKey: ['votes'],
+    queryFn: () => Promise.resolve(votes),
+    initialData: votes,
+  });
+}
+
+// Hook to verify user before voting
+export function useVerifyUser() {
+  return useMutation({
+    mutationFn: ({ nin, phoneNumber }: { nin: string; phoneNumber: string }) => 
+      verifyUser(nin, phoneNumber),
+  });
+}
+
+// Hook to submit a vote
+export function useSubmitVote() {
+  return useMutation({
+    mutationFn: (candidateId: number) => submitVote(candidateId),
+  });
+}
