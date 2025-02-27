@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { type Vote } from "@/types/schema";
 import { mockVotes } from "@/lib/mockData";
+import { VoteDistributionChart } from './VoteDistributionChart';
 
 export default function NigeriaMap() {
   const [selectedState, setSelectedState] = useState('');
 
   const getVoteStats = (state: string | null) => {
-    // For now, we'll return mock statistics since we don't have state-specific data
     const votes = mockVotes;
     const stateVotes = state === "all" || !state ? votes : votes.filter(v => (v as any).state === state);
     return {
@@ -17,6 +17,21 @@ export default function NigeriaMap() {
       atiku: stateVotes.filter(v => v.candidateId === 3).length,
     };
   };
+
+  // Transform data for the chart
+  const chartData = [
+    {
+      state: selectedState || 'National',
+      ...(() => {
+        const stats = getVoteStats(selectedState);
+        return {
+          apc: stats.tinubu,
+          pdp: stats.atiku,
+          lp: stats.obi
+        };
+      })()
+    }
+  ];
 
   return (
     <div className="flex flex-col md:flex-row gap-4 bg-card rounded-lg p-4 mb-6">
@@ -33,21 +48,12 @@ export default function NigeriaMap() {
             {/* Add more states as needed */}
           </SelectContent>
         </Select>
-        <div className="bg-muted p-4 rounded-lg">
+
+        <div className="bg-muted p-4 rounded-lg space-y-4">
           <h3 className="font-semibold mb-2">
             {selectedState || 'National'} Statistics
           </h3>
-          {(() => {
-            const stats = getVoteStats(selectedState);
-            return (
-              <div className="space-y-2">
-                <p>Total Votes: {stats.total.toLocaleString()}</p>
-                <p>Tinubu (APC): {stats.tinubu.toLocaleString()}</p>
-                <p>Obi (LP): {stats.obi.toLocaleString()}</p>
-                <p>Atiku (PDP): {stats.atiku.toLocaleString()}</p>
-              </div>
-            );
-          })()}
+          <VoteDistributionChart data={chartData} />
         </div>
       </div>
 
