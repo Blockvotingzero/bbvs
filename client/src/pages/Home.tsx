@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import NigeriaMap from "@/components/NigeriaMap";
 import { mockCandidates, mockVotes } from "@/lib/mockData";
-import type { Vote, Candidate } from "@/types/schema";
+import type { Vote } from "@/types/schema";
 
 export default function Home() {
   const [votes, setVotes] = useState<Vote[]>([]);
