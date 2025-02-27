@@ -24,17 +24,22 @@ export default function Vote() {
   React.useEffect(() => {
     const nin = localStorage.getItem('userNIN');
     if (!nin) {
+      console.log('No NIN found, redirecting to login');
       setLocation('/login');
     }
   }, [setLocation]);
 
   // Mock vote submission
   const handleVoteSubmission = async () => {
-    if (!selectedCandidate) return;
-
-    setIsVoting(true);
-
     try {
+      console.log('Starting vote submission for candidate:', selectedCandidate);
+
+      if (!selectedCandidate) {
+        throw new Error('No candidate selected');
+      }
+
+      setIsVoting(true);
+
       // Simulate blockchain processing time
       await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -44,18 +49,28 @@ export default function Vote() {
         .join("")
         .slice(0, 42);
 
+      console.log('Generated vote hash:', hash);
+
+      const candidate = mockCandidates.find(c => c.id === selectedCandidate);
+      if (!candidate) {
+        throw new Error('Selected candidate not found in mock data');
+      }
+
       setVoteHash(hash);
       setHasVoted(true);
       setShowConfirmDialog(false);
       setShowSuccessDialog(true);
-      setVotedCandidateName(selectedCandidateName || "");
+      setVotedCandidateName(candidate.name);
       setSelectedCandidate(null);
+
+      console.log('Vote successfully submitted');
 
       toast({
         title: "Vote Submitted",
         description: "Your vote has been recorded on the blockchain."
       });
     } catch (error) {
+      console.error('Vote submission failed:', error);
       toast({
         title: "Error",
         description: "Failed to submit vote. Please try again.",
@@ -67,14 +82,25 @@ export default function Vote() {
   };
 
   const onVoteSubmit = () => {
+    console.log('Vote submission requested for candidate:', selectedCandidate);
     if (!selectedCandidate || hasVoted) return;
     setShowConfirmDialog(true);
   };
 
   const handleCopyHash = async () => {
-    await navigator.clipboard.writeText(voteHash);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(voteHash);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+      console.log('Vote hash copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy hash:', err);
+      toast({
+        title: "Error",
+        description: "Failed to copy hash to clipboard",
+        variant: "destructive"
+      });
+    }
   };
 
   const selectedCandidateName = mockCandidates.find(c => c.id === selectedCandidate)?.name;
@@ -133,7 +159,12 @@ export default function Vote() {
             className={`cursor-pointer transition-colors ${
               selectedCandidate === candidate.id ? "border-primary" : ""
             } ${hasVoted ? "opacity-50 cursor-not-allowed" : ""}`}
-            onClick={() => !hasVoted && setSelectedCandidate(candidate.id)}
+            onClick={() => {
+              if (!hasVoted) {
+                console.log('Selected candidate:', candidate.id);
+                setSelectedCandidate(candidate.id);
+              }
+            }}
           >
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
