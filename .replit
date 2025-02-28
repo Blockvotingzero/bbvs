@@ -13,7 +13,6 @@ run = ["sh", "-c", "npx http-server dist -p 5000"]
 [[ports]]
 localPort = 5000
 externalPort = 80
-exposeLocalhost = true
 
 [workflows]
 runButton = "Start Development"
@@ -56,4 +55,4 @@ author = 40062539
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "vite --port 5000"
+args = "npm run dev"
