@@ -6,8 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Fingerprint, Phone } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   nin: z.string()
@@ -23,7 +25,9 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  
+  const { login } = useAuth();
+  const { toast } = useToast();
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,18 +36,25 @@ export default function Login() {
     }
   });
 
-  const onSubmit = useCallback((data: FormData) => {
-    // Store NIN in sessionStorage
-    localStorage.setItem('userNIN', data.nin);
-    
-    const intendedPath = localStorage.getItem('intendedPath') || '/vote';
-    localStorage.removeItem('intendedPath');
-    if (data.phone) {
-      setLocation("/otp");
-    } else {
-      setLocation("/liveness");
+  const onSubmit = useCallback(async (data: FormData) => {
+    try {
+      login(data.nin);
+      const intendedPath = localStorage.getItem('intendedPath') || '/vote';
+      localStorage.removeItem('intendedPath');
+
+      if (data.phone) {
+        setLocation("/otp");
+      } else {
+        setLocation("/liveness");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to login. Please try again.",
+        variant: "destructive"
+      });
     }
-  }, [setLocation]);
+  }, [setLocation, login, toast]);
 
   const phoneValue = form.watch("phone");
 

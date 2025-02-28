@@ -2,6 +2,7 @@ import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider, useAuth } from "./lib/auth";
 import Layout from "./components/Layout";
 import React, { Suspense } from "react";
 import { Loader2 } from "lucide-react";
@@ -22,9 +23,22 @@ const LoadingSpinner = () => (
   </div>
 );
 
-function Router() {
+// Protected Route wrapper
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
 
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      localStorage.setItem('intendedPath', window.location.pathname);
+      setLocation('/login');
+    }
+  }, [isAuthenticated, setLocation]);
+
+  return isAuthenticated ? <Component /> : null;
+}
+
+function Router() {
   return (
     <Layout>
       <Suspense fallback={<LoadingSpinner />}>
@@ -32,17 +46,11 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
           <Route path="/otp" component={OTPVerification} />
-          <Route path="/liveness" component={LivenessCheck} />
+          <Route path="/liveness">
+            {() => <ProtectedRoute component={LivenessCheck} />}
+          </Route>
           <Route path="/vote">
-            {() => {
-              const nin = localStorage.getItem('userNIN');
-              if (!nin) {
-                localStorage.setItem('intendedPath', '/vote');
-                setLocation('/login');
-                return null;
-              }
-              return <Vote />;
-            }}
+            {() => <ProtectedRoute component={Vote} />}
           </Route>
           <Route path="/explorer" component={Explorer} />
           <Route component={NotFound} />
@@ -55,8 +63,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

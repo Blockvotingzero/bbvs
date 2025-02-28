@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/client/index.html"
+    }
+  ],
+  "env": {
+    "VITE_APP_URL": "@app_url",
+    "VITE_API_URL": "@api_url",
+    "VITE_BLOCKCHAIN_NODE": "@blockchain_node"
+  }
+}
