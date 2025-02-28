@@ -37,3 +37,27 @@ export type User = z.infer<typeof userSchema>;
 export type Candidate = z.infer<typeof candidateSchema>;
 export type Vote = z.infer<typeof voteSchema>;
 export type State = z.infer<typeof stateSchema>;
+// Type definitions for the application
+
+export interface User {
+  id: number;
+  nin: string;
+  phoneNumber: string;
+  hasVoted: boolean;
+}
+
+export interface Candidate {
+  id: number;
+  name: string;
+  party: string;
+  avatar: string;
+}
+
+export interface Vote {
+  id: number;
+  candidateId: number;
+  voterHash: string;
+  timestamp: string;
+  blockHeight: number;
+  transactionHash: string;
+}
