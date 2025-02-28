@@ -1,3 +1,4 @@
+import { User, Candidate, Vote } from "@/types/schema";
 
 // Static mock data for the voting application
 export interface User {
@@ -49,15 +50,15 @@ export const candidates: Candidate[] = [
 const generateMockVotes = (): Vote[] => {
   const votes: Vote[] = [];
   let id = 1;
-  
+
   // Start time: 7 days ago
   const startTime = new Date();
   startTime.setDate(startTime.getDate() - 7);
-  
+
   // Generate random votes
   for (let i = 0; i < 1000; i++) {
     const candidateId = Math.floor(Math.random() * 3) + 1;
-    
+
     // Generate timestamp between start time and now
     const timestamp = new Date(
       startTime.getTime() + Math.random() * (Date.now() - startTime.getTime())
@@ -68,7 +69,7 @@ const generateMockVotes = (): Vote[] => {
       candidateId,
       voterHash: `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
       timestamp,
-      blockHeight: 1000000 + i, // Simulating increasing block heights
+      blockHeight: 1000000 + i,
       transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
     });
   }
@@ -82,35 +83,19 @@ const generateMockVotes = (): Vote[] => {
 // Generate and export votes
 export const votes: Vote[] = generateMockVotes();
 
-// Mock verification function (simulates server verification)
-export const verifyUser = async (nin: string, phoneNumber: string): Promise<{success: boolean, otp: string}> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { success: true, otp: "123456" };
-};
-
 // Mock voting function (simulates server vote)
-export const castVote = async (params: {
-  nin: string, 
-  phoneNumber: string, 
-  candidateId: number, 
-  otp: string
-}): Promise<{success: boolean, vote: Vote | null}> => {
+export const castVote = async (candidateId: number): Promise<Vote> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  if (params.otp !== "123456") {
-    return { success: false, vote: null };
-  }
-  
+
   const newVote: Vote = {
     id: votes.length + 1,
-    candidateId: params.candidateId,
+    candidateId,
     voterHash: `0x${Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`,
     timestamp: new Date().toISOString(),
     blockHeight: 1000000 + votes.length,
     transactionHash: `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
   };
-  
-  return { success: true, vote: newVote };
+
+  return newVote;
 };

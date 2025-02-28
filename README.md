@@ -12,7 +12,11 @@ Before you begin, ensure you have the following installed on your Windows machin
 
 1. Clone or download this repository to your local machine
 
-2. Open a command prompt or PowerShell in the project directory
+2. Create a `.env` file in the root directory:
+```bash
+# Copy the example environment file
+cp .env.example .env
+```
 
 3. Install dependencies:
 ```bash
@@ -30,6 +34,18 @@ npm run dev
 ```
 
 The application will be available at [http://localhost:5000](http://localhost:5000)
+
+## Environment Variables
+
+Make sure to set up the following environment variables in your `.env` file:
+```
+VITE_APP_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000/api
+VITE_BLOCKCHAIN_NODE=http://localhost:8545
+NODE_ENV=development
+```
+
+For production deployment, set these variables in your hosting platform (e.g., Vercel).
 
 ## Features
 - React frontend with TypeScript
@@ -49,14 +65,41 @@ npm run dev
 
 This will start the development server with hot reload enabled.
 
+## Production Build
+
+To create a production build:
+```bash
+npm run build
+```
+
+To preview the production build:
+```bash
+npm run preview
+```
+
 ## Troubleshooting
 
-If you encounter port conflicts:
-1. Check if port 5000 is already in use
-2. You can modify the port in `client/vite.config.ts` if needed
-3. Make sure no other services are using port 5000
+If you encounter any issues:
+
+1. Ensure all dependencies are installed:
+```bash
+npm install
+```
+
+2. Clear build cache and node modules:
+```bash
+npm run clean
+npm install
+```
+
+3. Verify environment variables are set correctly in `.env`
+
+4. Check if port 5000 is available (used by default)
 
 ## Project Structure
 - `/client/src` - Frontend React application
+  - `/components` - Reusable UI components
+  - `/pages` - Page components
+  - `/lib` - Utilities and configuration
+  - `/types` - TypeScript type definitions
 - `/shared` - Shared types and utilities
-- `/server` - Backend services (if applicable)
