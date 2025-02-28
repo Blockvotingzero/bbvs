@@ -38,7 +38,7 @@ export default function Home() {
     };
   });
 
-  const COLORS = ['#FF8042', '#00C49F', '#0088FE'];
+  const COLORS = ['#FF0000', '#00FF00', '#0000FF'];
   const totalVotes = votes.length;
   const formattedTotalVotes = totalVotes.toLocaleString();
 
