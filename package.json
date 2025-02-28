@@ -5,9 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "start": "vite --port 5000"
+    "build": "tsc --incremental && vite build",
+    "preview": "vite preview --port 5000",
+    "start": "vite --port 5000",
+    "lint": "eslint . --ext ts,tsx --fix",
+    "clean": "rm -rf dist node_modules/.vite"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

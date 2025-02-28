@@ -1,8 +1,8 @@
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -12,13 +12,14 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0', // This makes the server accessible from outside localhost
+    host: '0.0.0.0',
     port: 5000,
-    strictPort: true, // Ensures the server only tries to use the specified port
-    hmr: true // Enable hot module replacement for development
+    strictPort: true,
+    hmr: {
+      clientPort: 443 // Optimize for Replit environment
+    }
   },
   build: {
-    // Optimize for faster builds and better performance
     target: 'esnext',
     minify: 'terser',
     chunkSizeWarningLimit: 1000,
@@ -30,7 +31,8 @@ export default defineConfig({
           ui: ['@radix-ui/react-toast', '@radix-ui/react-dialog', '@radix-ui/react-popover']
         }
       }
-    }
+    },
+    sourcemap: false // Disable sourcemaps in production for better performance
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'wouter']
