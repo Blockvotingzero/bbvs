@@ -102,4 +102,4 @@ npm install
   - `/pages` - Page components
   - `/lib` - Utilities and configuration
   - `/types` - TypeScript type definitions
-- `/shared` - Shared types and utilities
+- `/shared` - Shared types and utilities"# bbvs" 
