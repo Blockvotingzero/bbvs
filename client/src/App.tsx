@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "./lib/auth";
 import Layout from "./components/Layout";
 import React, { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Lazy load components for better performance
 const Home = React.lazy(() => import("./pages/Home"));
@@ -41,33 +42,37 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 function Router() {
   return (
     <Layout>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/login" component={Login} />
-          <Route path="/otp" component={OTPVerification} />
-          <Route path="/liveness">
-            {() => <ProtectedRoute component={LivenessCheck} />}
-          </Route>
-          <Route path="/vote">
-            {() => <ProtectedRoute component={Vote} />}
-          </Route>
-          <Route path="/explorer" component={Explorer} />
-          <Route component={NotFound} />
-        </Switch>
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/login" component={Login} />
+            <Route path="/otp" component={OTPVerification} />
+            <Route path="/liveness">
+              {() => <ProtectedRoute component={LivenessCheck} />}
+            </Route>
+            <Route path="/vote">
+              {() => <ProtectedRoute component={Vote} />}
+            </Route>
+            <Route path="/explorer" component={Explorer} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 }
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router />
+          <Toaster />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

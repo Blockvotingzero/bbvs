@@ -3,9 +3,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Video, Camera, CheckCircle2 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 export default function LivenessCheck() {
   const [, setLocation] = useLocation();
+  const { setLivenessVerified, isAuthenticated } = useAuth();
   const [captured, setCaptured] = useState(false);
 
   const handleCapture = useCallback(() => {
@@ -14,12 +16,16 @@ export default function LivenessCheck() {
 
   const handleVerification = useCallback(() => {
     // In a real implementation, we would verify the captured image
-    // For now, we'll just redirect to the voting page
+    setLivenessVerified(true);
     setLocation("/vote");
-  }, [setLocation]);
+  }, [setLocation, setLivenessVerified]);
+
+  if (!isAuthenticated) {
+    return null; // Protected route will handle redirect
+  }
 
   return (
-    <div className="container max-w-lg mx-auto">
+    <div className="container max-w-lg mx-auto px-4 py-8">
       <Card>
         <CardHeader>
           <CardTitle>Liveness Check</CardTitle>

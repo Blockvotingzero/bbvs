@@ -7,10 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { Check, Copy, Loader2 } from "lucide-react";
 import { mockCandidates } from "@/lib/mockData";
+import { useAuth } from "@/lib/auth";
 
 export default function Vote() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { nin, isAuthenticated } = useAuth();
   const [selectedCandidate, setSelectedCandidate] = useState<number | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -22,12 +24,11 @@ export default function Vote() {
 
   // Check if user is authenticated
   React.useEffect(() => {
-    const nin = localStorage.getItem('userNIN');
-    if (!nin) {
-      console.log('No NIN found, redirecting to login');
+    if (!isAuthenticated || !nin) {
+      console.log('No authentication found, redirecting to login');
       setLocation('/login');
     }
-  }, [setLocation]);
+  }, [isAuthenticated, nin, setLocation]);
 
   // Mock vote submission
   const handleVoteSubmission = async () => {
@@ -105,6 +106,10 @@ export default function Vote() {
 
   const selectedCandidateName = mockCandidates.find(c => c.id === selectedCandidate)?.name;
 
+  if (!isAuthenticated || !nin) {
+    return null; // Protected route will handle redirect
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4">
       <div className="mb-8 p-4 sm:p-6 bg-card rounded-lg border shadow">
@@ -116,7 +121,7 @@ export default function Vote() {
           </div>
           <div>
             <h2 className="text-2xl font-semibold">Voter Profile</h2>
-            <p className="text-muted-foreground">NIN: {localStorage.getItem('userNIN')}</p>
+            <p className="text-muted-foreground">NIN: {nin}</p>
           </div>
         </div>
       </div>
@@ -252,7 +257,7 @@ export default function Vote() {
 
                     <div>
                       <div className="text-sm text-muted-foreground mb-2">Your vote hash (click to copy)</div>
-                      <div 
+                      <div
                         className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-background rounded border cursor-pointer hover:bg-accent transition-colors gap-2"
                         onClick={handleCopyHash}
                       >

@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "framework": "vite",
   "builds": [
     {
       "src": "package.json",
@@ -15,6 +16,14 @@
   "env": {
     "VITE_APP_URL": "@app_url",
     "VITE_API_URL": "@api_url",
-    "VITE_BLOCKCHAIN_NODE": "@blockchain_node"
+    "VITE_BLOCKCHAIN_NODE": "@blockchain_node",
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "VITE_APP_URL": "@app_url",
+      "VITE_API_URL": "@api_url",
+      "VITE_BLOCKCHAIN_NODE": "@blockchain_node"
+    }
   }
 }
