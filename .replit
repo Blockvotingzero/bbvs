@@ -16,7 +16,7 @@ externalPort = 80
 exposeLocalhost = true
 
 [workflows]
-runButton = "Start application"
+runButton = "Start Development"
 
 [[workflows.workflow]]
 name = "Project"
@@ -41,3 +41,19 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "vite --port 5000"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Start Production"
+author = 40062539
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build && npm run preview"
+
+[[workflows.workflow]]
+name = "Start Development"
+author = 40062539
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "vite --port 5000"
