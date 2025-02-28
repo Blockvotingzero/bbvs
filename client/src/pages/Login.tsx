@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Fingerprint, Phone } from "lucide-react";
+import { Fingerprint, Phone, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,6 +27,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const { login } = useAuth();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -38,6 +39,7 @@ export default function Login() {
 
   const onSubmit = useCallback(async (data: FormData) => {
     try {
+      setIsSubmitting(true);
       login(data.nin);
       const intendedPath = localStorage.getItem('intendedPath') || '/vote';
       localStorage.removeItem('intendedPath');
@@ -48,11 +50,14 @@ export default function Login() {
         setLocation("/liveness");
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Error",
         description: "Failed to login. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }, [setLocation, login, toast]);
 
@@ -81,6 +86,7 @@ export default function Login() {
                         placeholder="Enter your 11-digit NIN" 
                         {...field}
                         maxLength={11}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -99,6 +105,7 @@ export default function Login() {
                         placeholder="Enter your phone number" 
                         {...field}
                         maxLength={11}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -110,18 +117,26 @@ export default function Login() {
                 <Button
                   type="submit"
                   className="w-full gap-2"
-                  disabled={!phoneValue}
+                  disabled={!phoneValue || isSubmitting}
                 >
-                  <Phone className="h-4 w-4" />
-                  Proceed with OTP
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Phone className="h-4 w-4" />
+                  )}
+                  {isSubmitting ? "Processing..." : "Proceed with OTP"}
                 </Button>
                 <Button
                   type="submit"
                   className="w-full gap-2"
-                  disabled={!!phoneValue}
+                  disabled={!!phoneValue || isSubmitting}
                 >
-                  <Fingerprint className="h-4 w-4" />
-                  Proceed with Liveness Check
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Fingerprint className="h-4 w-4" />
+                  )}
+                  {isSubmitting ? "Processing..." : "Proceed with Liveness Check"}
                 </Button>
               </div>
             </form>
